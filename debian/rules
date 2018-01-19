@@ -18,9 +18,9 @@ override_dh_install:
 	rm -f debian/file-roller/usr/lib/*/nautilus/extensions-*/*.a
 	rm -f debian/file-roller/usr/lib/*/nautilus/extensions-*/*.la
 
-	/usr/bin/pkg-gnome-compat-desktop-file \
-		debian/file-roller/usr/share/applications/org.gnome.FileRoller.desktop \
-		debian/file-roller/usr/share/applications/file-roller.desktop
+	#/usr/bin/pkg-gnome-compat-desktop-file \
+	#	debian/file-roller/usr/share/applications/org.gnome.FileRoller.desktop \
+	#	debian/file-roller/usr/share/applications/file-roller.desktop
 
 override_dh_makeshlibs:
 	dh_makeshlibs --no-act
