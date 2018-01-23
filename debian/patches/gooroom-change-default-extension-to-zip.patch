@@ -1,0 +1,13 @@
+diff --git a/data/org.gnome.FileRoller.gschema.xml b/data/org.gnome.FileRoller.gschema.xml
+index 385d1bd..de3632c 100644
+--- a/data/org.gnome.FileRoller.gschema.xml
++++ b/data/org.gnome.FileRoller.gschema.xml
+@@ -162,7 +162,7 @@
+ 
+   <schema id="org.gnome.FileRoller.Dialogs.New" path="/org/gnome/file-roller/dialogs/new/" gettext-domain="file-roller">
+     <key name="default-extension" type="s">
+-      <default>'.tar.gz'</default>
++      <default>'.zip'</default>
+     </key>
+     <key name="other-options" type="b">
+       <default>false</default>
