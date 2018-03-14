@@ -1,3 +1,15 @@
+file-roller (3.26.2-0ubuntu1+grm1u1) bionic; urgency=medium
+
+  [ jongkyung.woo ]
+  * [aa79b4ad] Disabled /usr/bin/pkg-gnome-compat-desktop-file execution in rules
+
+  [ cjheo ]
+  * [5405b613] Adding the patch to change default extension to zip
+
+  [ Gooroom Autobuilder ]
+
+ -- Gooroom Autobuilder <jenkins@gooroom.kr>  Wed, 14 Mar 2018 12:07:21 +0900
+
 file-roller (3.26.2-0ubuntu1) bionic; urgency=medium
 
   * New upstream version
