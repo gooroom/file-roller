@@ -1,123 +1,136 @@
-file-roller (3.26.2-0ubuntu1+grm1u2) bionic; urgency=medium
+file-roller (3.30.1-2) unstable; urgency=medium
 
-  [ JunSung Choi ]
-  * [5d98b917] Apply iconv for EUC-KR encoding
+  * Restore -Wl,-O1 to our LDFLAGS
+  * Bump Standards-Version to 4.3.0
 
-  [ Gooroom Autobuilder ]
+ -- Jeremy Bicha <jbicha@debian.org>  Sun, 23 Dec 2018 20:34:26 -0500
 
- -- Gooroom Autobuilder <jenkins@gooroom.kr>  Thu, 26 Sep 2019 14:53:38 +0900
+file-roller (3.30.1-1) unstable; urgency=medium
 
-file-roller (3.26.2-0ubuntu1+grm1u1) bionic; urgency=medium
+  * New upstream release
 
-  [ jongkyung.woo ]
-  * [aa79b4ad] Disabled /usr/bin/pkg-gnome-compat-desktop-file execution in rules
+ -- Jeremy Bicha <jbicha@debian.org>  Tue, 09 Oct 2018 23:02:08 -0400
 
-  [ cjheo ]
-  * [5405b613] Adding the patch to change default extension to zip
+file-roller (3.30.0-1) unstable; urgency=medium
 
-  [ Gooroom Autobuilder ]
+  * New upstream release
 
- -- Gooroom Autobuilder <jenkins@gooroom.kr>  Wed, 14 Mar 2018 12:07:21 +0900
+ -- Sebastien Bacher <seb128@ubuntu.com>  Tue, 04 Sep 2018 11:39:46 +0200
 
-file-roller (3.26.2-0ubuntu1) bionic; urgency=medium
+file-roller (3.29.91-1) experimental; urgency=medium
 
-  * New upstream version
+  * New upstream release
 
- -- Sebastien Bacher <seb128@ubuntu.com>  Fri, 15 Dec 2017 13:46:07 +0100
+ -- Sebastien Bacher <seb128@ubuntu.com>  Tue, 28 Aug 2018 23:35:52 +0200
 
-file-roller (3.26.1-0ubuntu1) artful; urgency=medium
+file-roller (3.29.90-1) experimental; urgency=medium
+
+  * New upstream release
+
+ -- Andrea Azzarone <andrea.azzarone@canonical.com>  Thu, 09 Aug 2018 11:13:44 +0200
+
+file-roller (3.29.1-1) experimental; urgency=medium
+
+  * New upstream release
+  * debian/control*, gbp.conf: Update for experimental (3.29 series)
+
+ -- Andrea Azzarone <andrea.azzarone@canonical.com>  Fri, 27 Jul 2018 12:59:20 +0100
+
+file-roller (3.28.1-1) unstable; urgency=medium
+
+  * Team upload
+  * New upstream release
+  * Set Rules-Requires-Root to no
+  * Standards-Version: 4.1.5 (no changes required)
+
+ -- Simon McVittie <smcv@debian.org>  Thu, 26 Jul 2018 10:57:19 +0100
+
+file-roller (3.28.0-2) unstable; urgency=medium
+
+  * Update debian/gbp.conf
+  * Drop obsolete dh_translations overrides
+  * Bump Standards-Version to 4.1.4
+
+ -- Jeremy Bicha <jbicha@debian.org>  Wed, 23 May 2018 14:21:19 -0400
+
+file-roller (3.28.0-1) unstable; urgency=medium
+
+  * New upstream release
+  * Add workaround for Ubuntu translations issue
+  * Release to unstable
+
+ -- Jeremy Bicha <jbicha@debian.org>  Tue, 13 Mar 2018 11:58:35 -0400
+
+file-roller (3.27.90-1) experimental; urgency=medium
+
+  * New upstream development release
+  * Drop squashfs.patch: Applied in new release
+  * Build with meson
+
+ -- Jeremy Bicha <jbicha@debian.org>  Mon, 12 Feb 2018 15:39:42 -0500
+
+file-roller (3.26.2-3) unstable; urgency=medium
+
+  * Update Vcs fields for migration to https://salsa.debian.org/
+  * Bump debhelper compat to 11
+  * Build Nautilus extension again since it was re-enabled upstream
+    in 3.26
+  * On Ubuntu, depend on zip & unzip instead of p7zip-full because
+    p7zip-full is in universe
+
+ -- Jeremy Bicha <jbicha@debian.org>  Wed, 24 Jan 2018 13:32:15 -0500
+
+file-roller (3.26.2-2) unstable; urgency=medium
+
+  * Update Vcs fields for conversion to git
+  * Add debian/gbp.conf
+  * Bump Standards-Version to 4.1.2
+
+ -- Jeremy Bicha <jbicha@debian.org>  Thu, 14 Dec 2017 11:44:52 -0500
+
+file-roller (3.26.2-1) unstable; urgency=medium
+
+  * New upstream release
+  * Refresh patches
+
+ -- Michael Biebl <biebl@debian.org>  Wed, 01 Nov 2017 01:32:14 +0100
+
+file-roller (3.26.1-1) unstable; urgency=medium
+
+  * New upstream release
+  * Add squashfs.patch from Ubuntu:
+    - Support opening squashfs file systems and .snap files
+  * debian/control.in:
+    - Add squashfs-tools to Suggests, needed for above feature to work
+  * Bump Standards-Version to 4.1.1
+
+ -- Jeremy Bicha <jbicha@debian.org>  Fri, 13 Oct 2017 22:09:59 -0400
+
+file-roller (3.26.0-1) unstable; urgency=medium
 
   * New upstream translations release
 
- -- Jeremy Bicha <jbicha@ubuntu.com>  Thu, 05 Oct 2017 21:58:08 -0400
+ -- Jeremy Bicha <jbicha@debian.org>  Sat, 16 Sep 2017 18:33:27 -0400
 
-file-roller (3.26.0-0ubuntu3) artful; urgency=medium
-
-  * Revert dropping bz_unity_header.patch:
-    - This was a User Interface Freeze break.
-
- -- Jeremy Bicha <jbicha@ubuntu.com>  Tue, 03 Oct 2017 09:35:04 -0400
-
-file-roller (3.26.0-0ubuntu2) artful; urgency=medium
-
-  * Drop bz_unity_header.patch: No longer needed for Unity (LP: #1719322)
-
- -- Jeremy Bicha <jbicha@ubuntu.com>  Sat, 30 Sep 2017 11:43:39 -0400
-
-file-roller (3.26.0-0ubuntu1) artful; urgency=medium
+file-roller (3.25.91-1) unstable; urgency=medium
 
   * New upstream release
 
- -- Jeremy Bicha <jbicha@ubuntu.com>  Sat, 16 Sep 2017 18:30:45 -0400
+ -- Jeremy Bicha <jbicha@debian.org>  Mon, 04 Sep 2017 15:30:10 -0400
 
-file-roller (3.25.1-0ubuntu1) artful; urgency=medium
-
-  * New upstream release
-
- -- Jeremy Bicha <jbicha@ubuntu.com>  Tue, 08 Aug 2017 12:51:09 -0400
-
-file-roller (3.24.1-0ubuntu2) artful; urgency=medium
-
-  * Don't recommend sessioninstaller any more. GNOME Software provides the PK
-    session interface for us now. This is installed by seeds, and in case it's
-    not installed, the code in file-roller will do nothing.
-
- -- Iain Lane <iain.lane@canonical.com>  Tue, 25 Jul 2017 11:48:45 +0100
-
-file-roller (3.24.1-0ubuntu1) artful; urgency=medium
+file-roller (3.25.1-1) unstable; urgency=medium
 
   * New upstream release
-  * Drop revert_nautilus_extension_removal.patch because Ubuntu's
-    nautilus is newer than 3.22 now
   * Drop wayland_workaround.patch because the bug was fixed in 3.24.1
+  * Bump Standards-Version to 4.1.0
 
- -- Jeremy Bicha <jbicha@ubuntu.com>  Sat, 29 Apr 2017 12:03:32 -0400
-
-file-roller (3.22.3-1ubuntu1) zesty; urgency=medium
-
-  * Merge with Debian. Remaining changes:
-    - debian/control.in:
-      + Depend on zip and unzip instead of p7zip-full which is in universe
-      + Suggest p7zip-full and squashfs-tools
-      + Recommend sessioninstaller
-      + Bump minimum pkg-gnome-tools for desktop file compatibility script
-    - debian/rules:
-      + Make a compatibility desktop file for upgraders
-    - bz_unity_headerbar.patch:
-      + Don't use GtkHeaderBar in Unity
-    - squashfs.patch:
-      + Support squashfs and snap files
-    - revert_nautilus_extension_removal.patch:
-      + Revert removal of nautilus extension since we're not using
-        Nautilus 3.22 yet
-
- -- Iain Lane <iain.lane@canonical.com>  Mon, 06 Mar 2017 16:55:18 +0000
+ -- Jeremy Bicha <jbicha@ubuntu.com>  Tue, 29 Aug 2017 19:55:24 -0400
 
 file-roller (3.22.3-1) unstable; urgency=medium
 
   * New upstream release.
 
  -- Michael Biebl <biebl@debian.org>  Tue, 28 Feb 2017 02:30:38 +0100
-
-file-roller (3.22.2-2ubuntu1) zesty; urgency=medium
-
-  * Merge with Debian. Remaining changes:
-    - debian/control.in:
-      + Depend on zip and unzip instead of p7zip-full which is in universe
-      + Suggest p7zip-full and squashfs-tools
-      + Recommend sessioninstaller
-      + Bump minimum pkg-gnome-tools for desktop file compatibility script
-    - debian/rules:
-      + Make a compatibility desktop file for upgraders
-    - bz_unity_headerbar.patch:
-      + Don't use GtkHeaderBar in Unity
-    - squashfs.patch:
-      + Support squashfs and snap files
-    - revert_nautilus_extension_removal.patch:
-      + Revert removal of nautilus extension since we're not using
-        Nautilus 3.22 yet
-
- -- Jeremy Bicha <jbicha@ubuntu.com>  Tue, 14 Feb 2017 18:29:12 -0500
 
 file-roller (3.22.2-2) unstable; urgency=medium
 
@@ -159,7 +172,6 @@ file-roller (3.21.90-2) unstable; urgency=medium
   * Drop Build-Depends on libnautilus-extension-dev. The nautilus extension
     has been removed upstream as this functionality is now built directly into
     nautilus.
-  * Drop overrides for dh_install and dh_makeshlibs, no longer necessary.
 
  -- Michael Biebl <biebl@debian.org>  Wed, 31 Aug 2016 16:05:45 +0200
 
@@ -187,7 +199,7 @@ file-roller (3.20.2-3) unstable; urgency=medium
 file-roller (3.20.2-2) unstable; urgency=medium
 
   * debian/control.in: Drop gnome-icon-theme from the dependencies, do not
-    force an icon theme and rely on the one installed by the metapackages 
+    force an icon theme and rely on the one installed by the metapackages
 
  -- Laurent Bigonville <bigon@debian.org>  Sun, 05 Jun 2016 01:29:07 +0200
 
@@ -491,7 +503,7 @@ file-roller (2.91.92-1) experimental; urgency=low
   * New upstream release.
 
   [ Josselin Mouette ]
-  * 11_search_as_you_type.patch: patch from Siegfried-Angel Gevatter 
+  * 11_search_as_you_type.patch: patch from Siegfried-Angel Gevatter
     Pujals. Allow search-as-you-type in the file-roller window.
     Closes: #598131.
 
@@ -516,9 +528,9 @@ file-roller (2.30.2-2) unstable; urgency=low
   * Only suggest lzma. Closes: #595117.
   * Include some patches sitting in the upstream repository:
     + 01_rar_crasher.patch: fix a crasher with the rar command.
-    + 02_escape_newlines.patch: handle the case of files with newlines 
-      in their name. 
-    + 03_tar_xz_update.patch: update .tar.xz files without losing the 
+    + 02_escape_newlines.patch: handle the case of files with newlines
+      in their name.
+    + 03_tar_xz_update.patch: update .tar.xz files without losing the
       data in them. Closes: #594839.
 
  -- Josselin Mouette <joss@debian.org>  Sat, 18 Sep 2010 13:37:15 +0200
@@ -532,7 +544,7 @@ file-roller (2.30.2-1) unstable; urgency=low
 
 file-roller (2.30.1.1-2) unstable; urgency=low
 
-  * 10_command_dpkg.patch: new patch. Add support for .deb files using 
+  * 10_command_dpkg.patch: new patch. Add support for .deb files using
     dpkg. Closes: #515175.
   * 90_relibtoolize.patch: re-run the autotools on top of that.
 
@@ -555,7 +567,7 @@ file-roller (2.30.1.1-1) unstable; urgency=low
 
 file-roller (2.30.0-2) unstable; urgency=low
 
-  * 01_nodbus_build.patch: new patch. Fix FTBFS with PackageKit support 
+  * 01_nodbus_build.patch: new patch. Fix FTBFS with PackageKit support
     disabled.
 
  -- Josselin Mouette <joss@debian.org>  Thu, 08 Apr 2010 09:27:05 +0200
@@ -615,7 +627,7 @@ file-roller (2.26.2-1) unstable; urgency=low
   [ Josselin Mouette ]
   * New upstream release.
   * 70_autotools.patch: regenerated for the new version.
-  * Remove some autogenerated files in the clean target, the make the 
+  * Remove some autogenerated files in the clean target, the make the
     build fail.
 
  -- Josselin Mouette <joss@debian.org>  Thu, 11 Jun 2009 23:36:19 +0200
@@ -642,8 +654,8 @@ file-roller (2.24.1-1) experimental; urgency=low
   * Suggest rzip and unalz.
   * Depend on p7zip-full, since 7z can now be used for zip, rar and iso
     archives now.
-  * Let zip, unzip and unrar in Suggests for jar and cbr archives, as 
-    well as arj for arj write support. Add p7zip-rar as an alternative 
+  * Let zip, unzip and unrar in Suggests for jar and cbr archives, as
+    well as arj for arj write support. Add p7zip-rar as an alternative
     for unrar.
   * Drop genisoimage Recommends.
   * Move sharutils, ncompress, lzop, unace and cpio to Suggests.
@@ -674,8 +686,8 @@ file-roller (2.22.4-1) unstable; urgency=low
 
   [ Josselin Mouette ]
   * 99_ltmain_as-needed.patch: fix to apply with -p1. Closes: #485342.
-  * 01_menu_change.patch: remove this patch that causes file-roller not 
-    show up in the menu, there is really no point in doing so, unlike 
+  * 01_menu_change.patch: remove this patch that causes file-roller not
+    show up in the menu, there is really no point in doing so, unlike
     eog or evince. Closes: #484033.
 
   [ Sebastian Dröge ]
@@ -688,7 +700,7 @@ file-roller (2.22.4-1) unstable; urgency=low
 file-roller (2.22.3-1) unstable; urgency=low
 
   * New upstream bugfix release.
-  * 02_nautilus_2.20.patch: revert the gio migration of the nautilus 
+  * 02_nautilus_2.20.patch: revert the gio migration of the nautilus
     extension so that it can still build against nautilus 2.20.
   * 70_autoconf.patch: re-run autoconf on top of that.
 
@@ -976,7 +988,7 @@ file-roller (2.12.1-2) experimental; urgency=low
 file-roller (2.12.1-1) experimental; urgency=low
 
   [ Clément Stenac ]
-  * New upstream version  
+  * New upstream version
     * Don't update scrollkeeper during package build
     * Adapt menu entry patch to new upstream layout
 
@@ -991,10 +1003,10 @@ file-roller (2.10.4-2) unstable; urgency=low
   * Clément Stenac
     * Improve description
     * Depend on zip and unzip instead of merely suggesting (Closes:#261675)
-    * Recommend all free format handlers (all but unrar), so that 
+    * Recommend all free format handlers (all but unrar), so that
       aptitude and co users get them
     * Bump standards version to 3.6.2 (no changes required)
- 
+
  -- Clément Stenac <zorglub@debian.org>  Sat,  9 Jul 2005 16:45:30 +0200
 
 file-roller (2.10.4-1) unstable; urgency=low
@@ -1169,7 +1181,7 @@ file-roller (2.6.0-1) experimental; urgency=low
   * debian/control.in:
     + added Build-Depends on libxml-parser-perl.
     + updated Build-Depends.
-   
+
  -- Sebastien Bacher <seb128@debian.org>  Tue, 23 Mar 2004 21:24:45 +0100
 
 file-roller (2.4.4-1) unstable; urgency=low
@@ -1195,7 +1207,7 @@ file-roller (2.4.2-1) unstable; urgency=low
   * New upstream release.
   * debian/patches:
    + fix_lt_po.patch: new patch to fix lt.po file (Closes: #220164).
-  
+
  -- Sebastien Bacher <seb128@debian.org>  Tue, 11 Nov 2003 15:49:29 +0100
 
 file-roller (2.4.1.1-1) unstable; urgency=low
@@ -1243,8 +1255,8 @@ file-roller (2.3.4-1) unstable; urgency=low
   * debian/control
     + changed section to gnome.
     + updated build-depends.
-    + updated standards-version to 3.6.0.   
-  
+    + updated standards-version to 3.6.0.
+
  -- Sebastien Bacher <seb128@debian.org>  Mon, 11 Aug 2003 17:24:03 +0200
 
 file-roller (2.3.3-1) unstable; urgency=low
@@ -1272,13 +1284,13 @@ file-roller (2.2.3-1) unstable; urgency=low
 
 file-roller (2.2.1-1) unstable; urgency=low
 
-  * New upstream release.  
+  * New upstream release.
 
  -- Sebastien Bacher <seb128@debian.org>  Tue, 28 Jan 2003 20:21:07 +0100
 
 file-roller (2.2.0-1) unstable; urgency=low
 
-  * New upstream release.  
+  * New upstream release.
   * Fix typo in manual (Closes: #175145).
   * Updated Build-Depends.
   * Updated to standards-version 3.5.8.
@@ -1313,7 +1325,7 @@ file-roller2 (2.0.2-1) unstable; urgency=low
 
   * New maintainer.
   * New upstream release (Closes: #151771).
-  * Added gettext to Build-Depends (Closes: #159231).  
+  * Added gettext to Build-Depends (Closes: #159231).
   * Added scrollkeeper to Build-Depends.
 
  -- Sebastien Bacher <seb128@debian.org>  Thu, 12 Sep 2002 17:23:50 +0200
@@ -1466,4 +1478,3 @@ file-roller (0.2-1) unstable; urgency=low
   * Initial Release.
 
  -- Bastien Nocera <hadess@hadess.net>  Wed, 19 Dec 2001 17:15:09 +0000
-
