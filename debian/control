@@ -20,7 +20,8 @@ Build-Depends: debhelper (>= 10),
                libmagic-dev,
                libnautilus-extension-dev (>= 2.91.0),
                libnotify-dev (>= 0.4.3),
-               yelp-tools
+               yelp-tools,
+               file
 Standards-Version: 3.9.8
 Vcs-Bzr: https://code.launchpad.net/~ubuntu-desktop/file-roller/ubuntu
 Homepage: https://wiki.gnome.org/Apps/FileRoller
