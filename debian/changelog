@@ -1,3 +1,12 @@
+file-roller (3.26.2-0ubuntu1+grm1u3) bionic; urgency=medium
+
+  [ junsungc ]
+  * [d4aae71e] Fix iconv path bug
+
+  [ Gooroom Autobuilder ]
+
+ -- Gooroom Autobuilder <jenkins@gooroom.kr>  Fri, 06 Dec 2019 11:28:20 +0900
+
 file-roller (3.26.2-0ubuntu1+grm1u2) bionic; urgency=medium
 
   [ JunSung Choi ]
