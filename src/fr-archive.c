@@ -28,9 +28,6 @@
 #include <glib.h>
 #include <glib/gi18n.h>
 #include <gio/gio.h>
-#if ENABLE_MAGIC
-#  include <magic.h>
-#endif
 #include "glib-utils.h"
 #include "file-utils.h"
 #include "gio-utils.h"
@@ -415,7 +412,7 @@ fr_archive_class_init (FrArchiveClass *klass)
 			      G_SIGNAL_RUN_LAST,
 			      G_STRUCT_OFFSET (FrArchiveClass, stoppable),
 			      NULL, NULL,
-			      fr_marshal_VOID__BOOL,
+			      fr_marshal_VOID__BOOLEAN,
 			      G_TYPE_NONE,
 			      1, G_TYPE_BOOLEAN);
 	fr_archive_signals[WORKING_ARCHIVE] =
