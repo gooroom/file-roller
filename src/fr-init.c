@@ -46,6 +46,7 @@
 #if HAVE_JSON_GLIB
   #include "fr-command-unarchiver.h"
 #endif
+#include "fr-command-unsquashfs.h"
 #include "fr-command-unstuff.h"
 #include "fr-command-zip.h"
 #include "fr-command-zoo.h"
@@ -60,6 +61,7 @@
 /* The capabilities are computed automatically in
  * compute_supported_archive_types() so it's correct to initialize to 0 here. */
 FrMimeTypeDescription mime_type_desc[] = {
+	{ "application/epub+zip",               ".epub",     0 },
 	{ "application/x-7z-compressed",        ".7z",       0 },
 	{ "application/x-7z-compressed-tar",    ".tar.7z",   0 },
 	{ "application/x-ace",                  ".ace",      0 },
@@ -74,12 +76,15 @@ FrMimeTypeDescription mime_type_desc[] = {
 	{ "application/x-cbr",                  ".cbr",      0 },
 	{ "application/x-cbz",                  ".cbz",      0 },
 	{ "application/x-cd-image",             ".iso",      0 },
+	{ "application/x-chrome-extension",	".crx",      0 },
 	{ "application/x-compress",             ".Z",        0 },
 	{ "application/x-compressed-tar",       ".tar.gz",   0 },
 	{ "application/x-cpio",                 ".cpio",     0 },
 	{ "application/x-deb",                  ".deb",      0 },
 	{ "application/x-debian-package",	".deb",      0 },
 	{ "application/vnd.debian.binary-package",	".deb",      0 },
+	{ "application/vnd.snap",		".snap",     0 },
+	{ "application/vnd.squashfs",		".sqsh",     0 },
 	{ "application/x-ear",                  ".ear",      0 },
 	{ "application/x-ms-dos-executable",    ".exe",      0 },
 	{ "application/x-gzip",                 ".gz",       0 },
@@ -126,8 +131,10 @@ FrExtensionType file_ext_type[] = {
 	{ ".cbz", "application/x-cbz" },
 	{ ".click", "application/x-deb" },
 	{ ".cpio", "application/x-cpio" },
+	{ ".crx", "application/x-chrome-extension" },
 	{ ".deb", "application/x-deb" },
 	{ ".ear", "application/x-ear" },
+	{ ".epub", "application/epub+zip" },
 	{ ".exe", "application/x-ms-dos-executable" },
 	{ ".gz", "application/x-gzip" },
 	{ ".iso", "application/x-cd-image" },
@@ -143,6 +150,8 @@ FrExtensionType file_ext_type[] = {
 	{ ".rpm", "application/x-rpm" },
 	{ ".rz", "application/x-rzip" },
 	{ ".sit", "application/x-stuffit" },
+	{ ".snap", "application/vnd.snap" },
+	{ ".sqsh", "application/vnd.squashfs" },
 	{ ".swm", "application/x-ms-wim" },
 	{ ".tar", "application/x-tar" },
 	{ ".tar.bz", "application/x-bzip-compressed-tar" },
@@ -372,6 +381,7 @@ register_archives (void)
 	register_archive (FR_TYPE_COMMAND_LHA);
 	register_archive (FR_TYPE_COMMAND_RAR);
 	register_archive (FR_TYPE_COMMAND_RPM);
+	register_archive (FR_TYPE_COMMAND_UNSQUASHFS);
 	register_archive (FR_TYPE_COMMAND_UNSTUFF);
 	register_archive (FR_TYPE_COMMAND_ZIP);
 	register_archive (FR_TYPE_COMMAND_LRZIP);
@@ -632,7 +642,7 @@ initialize_data (void)
 					       NULL);
 
 	gtk_icon_theme_append_search_path (gtk_icon_theme_get_default (),
-					   PKG_DATA_DIR G_DIR_SEPARATOR_S "icons");
+					   PRIVDATADIR G_DIR_SEPARATOR_S "icons");
 
 	migrate_options_directory ();
 	register_archives ();

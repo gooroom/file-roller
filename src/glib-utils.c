@@ -28,9 +28,6 @@
 #include <glib/gprintf.h>
 #include <glib-object.h>
 #include "glib-utils.h"
-#if ENABLE_MAGIC
-#  include <magic.h>
-#endif
 
 
 #define MAX_PATTERNS 128
@@ -387,6 +384,27 @@ _g_str_get_static (const char *s)
         }
 
         return result;
+}
+
+
+/* utf8 */
+
+
+gboolean
+_g_utf8_all_spaces (const char *text)
+{
+	const char *scan;
+
+	if (text == NULL)
+		return TRUE;
+
+	for (scan = text; *scan != 0; scan = g_utf8_next_char (scan)) {
+		gunichar c = g_utf8_get_char (scan);
+		if (! g_unichar_isspace (c))
+			return FALSE;
+	}
+
+	return TRUE;
 }
 
 
@@ -1061,7 +1079,7 @@ sanitize_filename (const char *file_name)
 	prefix_len = 0;
 	for (p = file_name; *p; ) {
 		if (ISDOT (p[0]) && ISDOT (p[1]) && (ISSLASH (p[2]) || !p[2]))
-			prefix_len = p + 2 - file_name;
+			return NULL;
 
 		do {
 			char c = *p++;
@@ -1187,33 +1205,6 @@ const char *
 _g_mime_type_get_from_content (char  *buffer,
 			       gsize  buffer_size)
 {
-#if ENABLE_MAGIC
-
-	static magic_t magic = NULL;
-
-	if (magic == NULL) {
-		magic = magic_open (MAGIC_MIME_TYPE);
-		if (magic != NULL)
-			magic_load (magic, NULL);
-		else
-			g_warning ("unable to open magic database");
-	}
-
-	if (magic != NULL) {
-		const char * mime_type;
-
-		mime_type = magic_buffer (magic, buffer, buffer_size);
-		if ((mime_type != NULL) && (strcmp (mime_type, "application/octet-stream") == 0))
-			return NULL;
-
-		if (mime_type != NULL)
-			return mime_type;
-
-		g_warning ("unable to detect filetype from magic: %s", magic_error (magic));
-	}
-
-#else
-
 	static const struct magic {
 		const unsigned int off;
 		const unsigned int len;
@@ -1248,8 +1239,6 @@ _g_mime_type_get_from_content (char  *buffer,
 		else if (! memcmp (buffer + magic->off, magic->id, magic->len))
 			return magic->mime_type;
 	}
-
-#endif
 
 	return NULL;
 }
