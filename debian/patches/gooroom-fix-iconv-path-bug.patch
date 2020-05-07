@@ -249,10 +249,10 @@ index 163f035..6a8cf89 100644
  
  	if (! success && (error != NULL) && g_error_matches (*error, G_IO_ERROR, G_IO_ERROR_CANCELLED)) {
 diff --git a/src/fr-command-7z.c b/src/fr-command-7z.c
-index 617a964..c1891cf 100644
+index 617a964..394fe5c 100644
 --- a/src/fr-command-7z.c
 +++ b/src/fr-command-7z.c
-@@ -150,6 +150,50 @@ list__process_line (char     *line,
+@@ -150,6 +150,63 @@ list__process_line (char     *line,
  	if (strcmp (fields[0], "Path") == 0) {
  		fdata->free_original_path = TRUE;
  		fdata->original_path = g_strdup (fields[1]);
@@ -296,10 +296,23 @@ index 617a964..c1891cf 100644
 +            }
 +        }
 +
-+        sprintf(iconv, "echo $(echo %s | iconv -c -f UTF-8 -t ISO-8859-1) | iconv -c -f EUC-KR -t UTF-8", s1);
++        sprintf(iconv, "echo %s | iconv -c -f UTF-8 -t ISO-8859-1", s1);
 +        fp = popen(iconv, "r");
 +        fgets(buf,sizeof(buf),fp);
-+        fdata->original_path = buf;
++        int haveKo = 0;
++        for (int i=0; buf[i] != NULL; i++) {
++            if (buf[i] & 0x80)
++                haveKo = 1;
++        }
++
++        if (haveKo) {
++            memset(iconv, 0, sizeof(iconv));
++            memset(buf, 0, sizeof(buf));
++            sprintf(iconv, "echo $(echo %s | iconv -c -f UTF-8 -t ISO-8859-1) | iconv -c -f EUC-KR -t UTF-8", s1);
++            fp = popen(iconv, "r");
++            fgets(buf,sizeof(buf),fp);
++            fdata->original_path = buf;
++        }
  		fdata->full_path = g_strconcat ((fdata->original_path[0] != '/') ? "/" : "",
  						fdata->original_path,
  						(fdata->dir && (fdata->original_path[strlen (fdata->original_path) - 1] != '/')) ? "/" : "",
