@@ -1,2 +1,3 @@
 01_package_names.patch
 gooroom-fix-iconv-path-bug.patch
+gooroom-changed-nautilus-to-nemo-and-remove-dependency.patch
