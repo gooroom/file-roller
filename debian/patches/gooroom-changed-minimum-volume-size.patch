@@ -1,0 +1,25 @@
+From 3b195aa70c6f5253ad08803555298e0f84adc47c Mon Sep 17 00:00:00 2001
+From: donghun <donghun@gooroom.kr>
+Date: Wed, 21 Oct 2020 18:28:35 +0900
+Subject: [PATCH] Changed the minimum volume size
+
+---
+ src/ui/new-archive-dialog.ui | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/ui/new-archive-dialog.ui b/src/ui/new-archive-dialog.ui
+index 02c6032..854902f 100644
+--- a/src/ui/new-archive-dialog.ui
++++ b/src/ui/new-archive-dialog.ui
+@@ -286,7 +286,7 @@
+     </child>
+   </object>
+   <object class="GtkAdjustment" id="volume_adjustment">
+-    <property name="lower">0.10000000000000001</property>
++    <property name="lower">0.00000000000000000</property>
+     <property name="upper">10000000000</property>
+     <property name="step_increment">0.10000000000000001</property>
+     <property name="page_increment">10</property>
+-- 
+2.20.1
+
