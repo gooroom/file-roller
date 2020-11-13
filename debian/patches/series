@@ -2,3 +2,4 @@
 gooroom-fix-iconv-path-bug.patch
 gooroom-changed-minimum-volume-size.patch
 gooroom-add-nemo-properties.patch
+gooroom-removed-unsupported-formats.patch
