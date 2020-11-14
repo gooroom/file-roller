@@ -1,3 +1,12 @@
+file-roller (3.30.1-2+grm2u6) unstable; urgency=medium
+
+  [ donghun ]
+  * [16759f83] Removed unsupported formats
+
+  [ Gooroom Autobuilder ]
+
+ -- Gooroom Autobuilder <jenkins@gooroom.kr>  Sat, 14 Nov 2020 12:27:19 +0900
+
 file-roller (3.30.1-2+grm2u5) unstable; urgency=medium
 
   [ donghun ]
