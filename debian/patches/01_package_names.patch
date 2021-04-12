@@ -1,0 +1,32 @@
+From: Jordi Mallach <jordi@debian.org>
+Date: Sun, 13 Nov 2011 22:39:33 +0100
+Subject: Fix PackageKit package name matches for xz and rpm files.
+
+---
+ data/packages.match | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/data/packages.match b/data/packages.match
+index 68ce591..57abe3b 100644
+--- a/data/packages.match
++++ b/data/packages.match
+@@ -17,16 +17,16 @@ p7zip=
+ p7zip-full=
+ p7zip-rar=
+ rar=
+-rpm=
++rpm=rpm2cpio
+ rzip=
+ tar=
+ unace=
+ unalz=
+-unarchiver=
++unarchiver=unar
+ unrar=
+ unstaff=
+ unzip=
+-xz=
++xz=xz-utils
+ zip=
+ zstd=
+ zoo=
