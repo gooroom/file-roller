@@ -22,9 +22,6 @@
 #include <config.h>
 #include <string.h>
 #include <glib/gi18n.h>
-#ifdef ENABLE_PACKAGEKIT
-#include <gdk/gdkx.h>
-#endif
 #include <gtk/gtk.h>
 #include "dlg-package-installer.h"
 #include "gio-utils.h"
@@ -94,7 +91,7 @@ packagekit_install_package_names_ready_cb (GObject      *source_object,
 	GDBusProxy      *proxy;
 	GVariant        *values;
 	GError          *error = NULL;
-	FrErrorType  error_type = FR_ERROR_NONE;
+	FrErrorType      error_type = FR_ERROR_NONE;
 	char            *error_message = NULL;
 
 	proxy = G_DBUS_PROXY (source_object);
@@ -103,7 +100,7 @@ packagekit_install_package_names_ready_cb (GObject      *source_object,
 		if (g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED)
 		    || (g_error_matches (error, G_IO_ERROR, G_IO_ERROR_DBUS_ERROR)
 			&& (error->message != NULL)
-			&& (strstr (error->message, "org.freedesktop.Packagekit.Modify.Cancelled") != NULL)))
+			&& (strstr (error->message, "org.freedesktop.Packagekit.Modify2.Cancelled") != NULL)))
 		{
 			error_type = FR_ERROR_STOPPED;
 			error_message = NULL;
@@ -175,7 +172,7 @@ install_packages (InstallerData *idata)
 		if (window != NULL) {
 			GdkCursor *cursor;
 
-			cursor = gdk_cursor_new (GDK_WATCH);
+			cursor = gdk_cursor_new_for_display (gdk_display_get_default(), GDK_WATCH);
 			gdk_window_set_cursor (window, cursor);
 
 			g_object_unref (cursor);
@@ -186,29 +183,28 @@ install_packages (InstallerData *idata)
 					       NULL,
 					       "org.freedesktop.PackageKit",
 					       "/org/freedesktop/PackageKit",
-					       "org.freedesktop.PackageKit.Modify",
+					       "org.freedesktop.PackageKit.Modify2",
 					       idata->cancellable,
 					       &error);
 
 		if (proxy != NULL) {
-			guint   xid;
-			char  **names;
-			char  **real_names;
-
-			if (window != NULL)
-				xid = GDK_WINDOW_XID (window);
-			else
-				xid = 0;
+			char     **names;
+			char     **real_names;
+			char      *desktop_startup_id;
+			GVariant  *platform_data;
 
 			names = g_strsplit (idata->packages, ",", -1);
 			real_names = get_packages_real_names (names);
+			desktop_startup_id = g_strdup_printf ("_TIME%i", gtk_get_current_event_time ());
+			platform_data = g_variant_new_parsed ("{'desktop-startup-id': %v}", g_variant_new_take_string (desktop_startup_id));
 
 			g_dbus_proxy_call (proxy,
 					   "InstallPackageNames",
-					   g_variant_new ("(u^ass)",
-							  xid,
+					   g_variant_new ("(^asss@a{sv})",
 							  real_names,
-							  "hide-confirm-search,hide-finished,hide-warning"),
+							  "hide-confirm-search,hide-finished,hide-warning",
+							  "org.gnome.FileRoller",
+							  platform_data),
 					   G_DBUS_CALL_FLAGS_NONE,
 					   G_MAXINT,
 					   idata->cancellable,

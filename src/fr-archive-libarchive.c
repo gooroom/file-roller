@@ -42,13 +42,13 @@
 #define FILE_ATTRIBUTES_NEEDED_BY_ARCHIVE_ENTRY ("standard::*,time::*,access::*,unix::*")
 
 
-G_DEFINE_TYPE (FrArchiveLibarchive, fr_archive_libarchive, FR_TYPE_ARCHIVE)
-
-
 struct _FrArchiveLibarchivePrivate {
 	gssize compressed_size;
 	gssize uncompressed_size;
 };
+
+
+G_DEFINE_TYPE_WITH_PRIVATE (FrArchiveLibarchive, fr_archive_libarchive, FR_TYPE_ARCHIVE)
 
 
 static void
@@ -83,13 +83,16 @@ const char *libarchiver_mime_types[] = {
 	"application/x-lrzip-compressed-tar",
 	"application/x-lzip-compressed-tar",
 	"application/x-lzma-compressed-tar",
-	"application/x-lzop-compressed-tar",
 	"application/x-rar",
 	"application/x-rpm",
 	"application/x-tar",
 	"application/x-tarz",
+	"application/x-tzo",
 	"application/x-xar",
 	"application/x-xz-compressed-tar",
+#if (ARCHIVE_VERSION_NUMBER >= 3003003)
+	"application/x-zstd-compressed-tar",
+#endif
 	"application/zip",
 	NULL
 };
@@ -111,10 +114,14 @@ fr_archive_libarchive_get_capabilities (FrArchive  *archive,
 
 	capabilities = FR_ARCHIVE_CAN_STORE_MANY_FILES;
 
-	/* write-only formats */
+	/* give priority to 7z* for 7z archives. */
 	if (strcmp (mime_type, "application/x-7z-compressed") == 0) {
-		capabilities |= FR_ARCHIVE_CAN_WRITE;
-		return capabilities;
+		if (_g_program_is_available ("7za", check_command)
+		    || _g_program_is_available ("7zr", check_command)
+		    || _g_program_is_available ("7z", check_command))
+		{
+			return capabilities;
+		}
 	}
 
 	/* give priority to 7za that supports CAB files better. */
@@ -274,6 +281,73 @@ load_data_read (struct archive  *a,
 }
 
 
+static gint64
+load_data_seek (struct archive *a,
+		void           *client_data,
+		gint64          request,
+		int             whence)
+{
+	GSeekable *seekable;
+	GSeekType  seektype;
+	off_t      new_offset;
+
+	LoadData *load_data = client_data;
+
+	seekable = (GSeekable*)(load_data->istream);
+	if ((load_data->error != NULL) || (load_data->istream == NULL))
+		return -1;
+
+	switch (whence) {
+	case SEEK_SET:
+		seektype = G_SEEK_SET;
+		break;
+	case SEEK_CUR:
+		seektype = G_SEEK_CUR;
+		break;
+	case SEEK_END:
+		seektype = G_SEEK_END;
+		break;
+	default:
+		return -1;
+	}
+
+	g_seekable_seek (seekable,
+			 request,
+			 seektype,
+			 load_data->cancellable,
+			 &load_data->error);
+	new_offset = g_seekable_tell (seekable);
+	if (load_data->error != NULL)
+		return -1;
+
+	return new_offset;
+}
+
+
+static gint64
+load_data_skip (struct archive *a,
+		void           *client_data,
+		gint64          request)
+{
+	GSeekable *seekable;
+	off_t      old_offset, new_offset;
+
+	LoadData *load_data = client_data;
+
+	seekable = (GSeekable*)(load_data->istream);
+	if (load_data->error != NULL || load_data->istream == NULL)
+		return -1;
+
+	old_offset = g_seekable_tell (seekable);
+	new_offset = load_data_seek (a, client_data, request, SEEK_CUR);
+	if (new_offset > old_offset)
+		return (new_offset - old_offset);
+
+	return 0;
+}
+
+
+
 static int
 load_data_close (struct archive *a,
 		 void           *client_data)
@@ -289,6 +363,25 @@ load_data_close (struct archive *a,
 	}
 
 	return ARCHIVE_OK;
+}
+
+
+static int
+create_read_object (LoadData        *load_data,
+		    struct archive **a)
+{
+	*a = archive_read_new ();
+	archive_read_support_filter_all (*a);
+	archive_read_support_format_all (*a);
+
+	archive_read_set_open_callback (*a, load_data_open);
+	archive_read_set_read_callback (*a, load_data_read);
+	archive_read_set_close_callback (*a, load_data_close);
+	archive_read_set_seek_callback (*a, load_data_seek);
+	archive_read_set_skip_callback (*a, load_data_skip);
+	archive_read_set_callback_data (*a, load_data);
+
+	return archive_read_open1 (*a);
 }
 
 
@@ -349,10 +442,12 @@ list_archive_thread (GSimpleAsyncResult *result,
 	fr_archive_progress_set_total_bytes (load_data->archive,
 					     _g_file_get_size (fr_archive_get_file (load_data->archive), cancellable));
 
-	a = archive_read_new ();
-	archive_read_support_filter_all (a);
-	archive_read_support_format_all (a);
-	archive_read_open (a, load_data, load_data_open, load_data_read, load_data_close);
+	r = create_read_object (load_data, &a);
+	if (r != ARCHIVE_OK) {
+		archive_read_free(a);
+		return;
+	}
+
 	while ((r = archive_read_next_header (a, &entry)) == ARCHIVE_OK) {
 		FileData   *file_data;
 		const char *pathname;
@@ -403,7 +498,6 @@ list_archive_thread (GSimpleAsyncResult *result,
 
 		archive_read_data_skip (a);
 	}
-	archive_read_free (a);
 
 	if ((load_data->error == NULL) && (r != ARCHIVE_EOF) && (archive_error_string (a) != NULL))
 		load_data->error = _g_error_new_from_archive_error (archive_error_string (a));
@@ -412,6 +506,7 @@ list_archive_thread (GSimpleAsyncResult *result,
 	if (load_data->error != NULL)
 		g_simple_async_result_set_from_error (result, load_data->error);
 
+	archive_read_free (a);
 	load_data_free (load_data);
 }
 
@@ -602,6 +697,46 @@ _g_output_stream_add_padding (ExtractData    *extract_data,
 	return success;
 }
 
+static gboolean
+_g_file_contains_symlinks_in_path (const char *relative_path,
+				   GFile      *destination,
+				   GHashTable *symlinks)
+{
+	gboolean  contains_symlinks = FALSE;
+	GFile    *parent;
+	char    **components;
+	int       i;
+
+	if (relative_path == NULL)
+		return FALSE;
+
+	if (destination == NULL)
+		return TRUE;
+
+	parent = g_object_ref (destination);
+	components = g_strsplit (relative_path, "/", -1);
+	for (i = 0; (components[i] != NULL) && (components[i + 1] != NULL); i++) {
+		GFile *tmp;
+
+		if (components[i][0] == 0)
+			continue;
+
+		tmp = g_file_get_child (parent, components[i]);
+		g_object_unref (parent);
+		parent = tmp;
+
+		if (g_hash_table_contains (symlinks, parent)) {
+			contains_symlinks = TRUE;
+			break;
+		}
+	}
+
+	g_strfreev (components);
+	g_object_unref (parent);
+
+	return contains_symlinks;
+}
+
 
 static void
 extract_archive_thread (GSimpleAsyncResult *result,
@@ -613,6 +748,7 @@ extract_archive_thread (GSimpleAsyncResult *result,
 	GHashTable           *checked_folders;
 	GHashTable           *created_files;
 	GHashTable           *folders_created_during_extraction;
+	GHashTable           *symlinks;
 	struct archive       *a;
 	struct archive_entry *entry;
 	int                   r;
@@ -620,15 +756,18 @@ extract_archive_thread (GSimpleAsyncResult *result,
 	extract_data = g_simple_async_result_get_op_res_gpointer (result);
 	load_data = LOAD_DATA (extract_data);
 
+	r = create_read_object (load_data, &a);
+	if (r != ARCHIVE_OK) {
+		archive_read_free(a);
+		return;
+	}
+
 	checked_folders = g_hash_table_new_full (g_file_hash, (GEqualFunc) g_file_equal, g_object_unref, NULL);
 	created_files = g_hash_table_new_full (g_file_hash, (GEqualFunc) g_file_equal, g_object_unref, g_object_unref);
 	folders_created_during_extraction = g_hash_table_new_full (g_file_hash, (GEqualFunc) g_file_equal, g_object_unref, NULL);
+	symlinks = g_hash_table_new_full (g_file_hash, (GEqualFunc) g_file_equal, g_object_unref, NULL);
 	fr_archive_progress_set_total_files (load_data->archive, extract_data->n_files_to_extract);
 
-	a = archive_read_new ();
-	archive_read_support_filter_all (a);
-	archive_read_support_format_all (a);
-	archive_read_open (a, load_data, load_data_open, load_data_read, load_data_close);
 	while ((r = archive_read_next_header (a, &entry)) == ARCHIVE_OK) {
 		const char    *pathname;
 		char          *fullpath;
@@ -654,6 +793,22 @@ extract_archive_thread (GSimpleAsyncResult *result,
 		fullpath = (*pathname == '/') ? g_strdup (pathname) : g_strconcat ("/", pathname, NULL);
 		relative_path = _g_path_get_relative_basename_safe (fullpath, extract_data->base_dir, extract_data->junk_paths);
 		if (relative_path == NULL) {
+			fr_archive_progress_inc_completed_files (load_data->archive, 1);
+			fr_archive_progress_inc_completed_bytes (load_data->archive, archive_entry_size_is_set (entry) ? archive_entry_size (entry) : 0);
+			archive_read_data_skip (a);
+			continue;
+		}
+
+		/* Symlinks in parents are dangerous as it can easily happen
+		 * that files are written outside of the destination. The tar
+		 * cmd fails to extract such archives with ENOTDIR. Let's skip
+		 * those files here for sure. This is most probably malicious,
+		 * or corrupted archive.
+		 */
+		if (_g_file_contains_symlinks_in_path (relative_path, extract_data->destination, symlinks)) {
+			g_warning ("Skipping '%s' file as it has symlink in parents.", relative_path);
+			fr_archive_progress_inc_completed_files (load_data->archive, 1);
+			fr_archive_progress_inc_completed_bytes (load_data->archive, archive_entry_size_is_set (entry) ? archive_entry_size (entry) : 0);
 			archive_read_data_skip (a);
 			continue;
 		}
@@ -858,10 +1013,22 @@ extract_archive_thread (GSimpleAsyncResult *result,
 
 			case AE_IFLNK:
 				if (! g_file_make_symbolic_link (file, archive_entry_symlink (entry), cancellable, &local_error)) {
-					if (! g_error_matches (local_error, G_IO_ERROR, G_IO_ERROR_EXISTS))
+					if (g_error_matches (local_error, G_IO_ERROR, G_IO_ERROR_EXISTS)) {
+						g_clear_error (&local_error);
+						if (g_file_delete (file, cancellable, &local_error)) {
+							g_clear_error (&local_error);
+							if (! g_file_make_symbolic_link (file, archive_entry_symlink (entry), cancellable, &local_error))
+								load_data->error = g_error_copy (local_error);
+						}
+						else
+							load_data->error = g_error_copy (local_error);
+					}
+					else
 						load_data->error = g_error_copy (local_error);
 					g_clear_error (&local_error);
 				}
+				if (load_data->error == NULL)
+					g_hash_table_add (symlinks, g_object_ref (file));
 				archive_read_data_skip (a);
 				break;
 
@@ -896,6 +1063,7 @@ extract_archive_thread (GSimpleAsyncResult *result,
 	g_hash_table_unref (folders_created_during_extraction);
 	g_hash_table_unref (created_files);
 	g_hash_table_unref (checked_folders);
+	g_hash_table_unref (symlinks);
 	archive_read_free (a);
 	extract_data_free (extract_data);
 }
@@ -1163,7 +1331,7 @@ _archive_write_set_format_from_context (struct archive *a,
 		archive_write_set_format_pax_restricted (a);
 		archive_filter = ARCHIVE_FILTER_LZMA;
 	}
-	else if (_g_str_equal (mime_type, "application/x-lzop-compressed-tar")) {
+	else if (_g_str_equal (mime_type, "application/x-tzo")) {
 		archive_write_set_format_pax_restricted (a);
 		archive_filter = ARCHIVE_FILTER_LZOP;
 	}
@@ -1171,6 +1339,12 @@ _archive_write_set_format_from_context (struct archive *a,
 		archive_write_set_format_pax_restricted (a);
 		archive_filter = ARCHIVE_FILTER_XZ;
 	}
+#if (ARCHIVE_VERSION_NUMBER >= 3003003)
+	else if (_g_str_equal (mime_type, "application/x-zstd-compressed-tar")) {
+		archive_write_set_format_pax_restricted (a);
+		archive_filter = ARCHIVE_FILTER_ZSTD;
+	}
+#endif
 	else if (_g_str_equal (mime_type, "application/x-tar")) {
 		archive_write_add_filter_none (a);
 		archive_write_set_format_pax_restricted (a);
@@ -1225,6 +1399,11 @@ _archive_write_set_format_from_context (struct archive *a,
 		case ARCHIVE_FILTER_XZ:
 			archive_write_add_filter_xz (a);
 			break;
+#if (ARCHIVE_VERSION_NUMBER >= 3003003)
+		case ARCHIVE_FILTER_ZSTD:
+			archive_write_add_filter_zstd (a);
+			break;
+#endif
 		default:
 			break;
 		}
@@ -1232,19 +1411,40 @@ _archive_write_set_format_from_context (struct archive *a,
 		/* set the compression level */
 
 		compression_level = NULL;
-		switch (save_data->compression) {
-		case FR_COMPRESSION_VERY_FAST:
-			compression_level = "1";
-			break;
-		case FR_COMPRESSION_FAST:
-			compression_level = "3";
-			break;
-		case FR_COMPRESSION_NORMAL:
-			compression_level = "6";
-			break;
-		case FR_COMPRESSION_MAXIMUM:
-			compression_level = "9";
-			break;
+#if (ARCHIVE_VERSION_NUMBER >= 3003003)
+		if (archive_filter == ARCHIVE_FILTER_ZSTD) {
+			switch (save_data->compression) {
+			case FR_COMPRESSION_VERY_FAST:
+				compression_level = "1";
+				break;
+			case FR_COMPRESSION_FAST:
+				compression_level = "2";
+				break;
+			case FR_COMPRESSION_NORMAL:
+				compression_level = "3";
+				break;
+			case FR_COMPRESSION_MAXIMUM:
+				compression_level = "22";
+				break;
+			}
+		}
+		else
+#endif
+		{
+			switch (save_data->compression) {
+			case FR_COMPRESSION_VERY_FAST:
+				compression_level = "1";
+				break;
+			case FR_COMPRESSION_FAST:
+				compression_level = "3";
+				break;
+			case FR_COMPRESSION_NORMAL:
+				compression_level = "6";
+				break;
+			case FR_COMPRESSION_MAXIMUM:
+				compression_level = "9";
+				break;
+			}
 		}
 		if (compression_level != NULL)
 			archive_write_set_filter_option (a, NULL, "compression-level", compression_level);
@@ -1436,10 +1636,7 @@ save_archive_thread (GSimpleAsyncResult *result,
 	archive_write_open (b, save_data, save_data_open, save_data_write, save_data_close);
 	archive_write_set_bytes_in_last_block (b, 1);
 
-	a = archive_read_new ();
-	archive_read_support_filter_all (a);
-	archive_read_support_format_all (a);
-	archive_read_open (a, load_data, load_data_open, load_data_read, load_data_close);
+	create_read_object (load_data, &a);
 
 	if (save_data->begin_operation != NULL)
 		save_data->begin_operation (save_data, save_data->user_data);
@@ -2161,7 +2358,6 @@ fr_archive_libarchive_class_init (FrArchiveLibarchiveClass *klass)
 	FrArchiveClass *archive_class;
 
 	fr_archive_libarchive_parent_class = g_type_class_peek_parent (klass);
-	g_type_class_add_private (klass, sizeof (FrArchiveLibarchivePrivate));
 
 	gobject_class = G_OBJECT_CLASS (klass);
 	gobject_class->finalize = fr_archive_libarchive_finalize;
@@ -2186,7 +2382,7 @@ fr_archive_libarchive_init (FrArchiveLibarchive *self)
 {
 	FrArchive *base = FR_ARCHIVE (self);
 
-	self->priv = G_TYPE_INSTANCE_GET_PRIVATE (self, FR_TYPE_ARCHIVE_LIBARCHIVE, FrArchiveLibarchivePrivate);
+	self->priv = fr_archive_libarchive_get_instance_private (self);
 
 	base->propAddCanReplace = TRUE;
 	base->propAddCanUpdate = TRUE;

@@ -4,6 +4,7 @@
       id="archive-extract">
 
   <info>
+    <title type="sort" its:translate="no">5</title>
     <link type="guide" xref="index#managing-archives"/>
     <link type="seealso" xref="archive-open"/>
     <link type="seealso" xref="password-protection"/>
@@ -12,14 +13,15 @@
     <revision pkgversion="3.6" date="2012-08-05" status="review"/>
     <revision pkgversion="3.8" date="2013-03-25" status="candidate"/>
     <revision pkgversion="3.12" date="2014-03-23" status="review"/>
+    <revision pkgversion="3.34" date="2020-02-09" status="candidate"/>
 
     <credit type="author">
       <name>Marta Bogdanowicz</name>
-      <email its:translate="no">majus85@gmail.com</email>
+      <email>majus85@gmail.com</email>
     </credit>
     <credit type="editor">
       <name>Ekaterina Gerasimova</name>
-      <email its:translate="no">kittykat3756@gmail.com</email>
+      <email>kittykat3756@gmail.com</email>
     </credit>
 
     <include href="legal.xml" xmlns="http://www.w3.org/2001/XInclude"/>
@@ -59,9 +61,6 @@
       If the extraction completes successfully, you will be asked whether you
       want to:</p>
       <list>
-        <item>
-          <p><gui>Quit</gui> to close <app>Archive Manager</app>.</p>
-        </item>
         <item>
           <p><gui>Show the files</gui> to view the destination folder with
           <app>Files</app>.</p>

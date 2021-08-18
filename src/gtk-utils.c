@@ -502,7 +502,7 @@ _gtk_show_help_dialog (GtkWindow  *parent,
 	GError *error = NULL;
 
 	uri = g_strconcat ("help:file-roller", section ? "?" : NULL, section, NULL);
-	if (! gtk_show_uri (gtk_window_get_screen (parent), uri, GDK_CURRENT_TIME, &error)) {
+	if (! gtk_show_uri_on_window (parent, uri, GDK_CURRENT_TIME, &error)) {
   		GtkWidget *dialog;
 
 		dialog = _gtk_message_dialog_new (parent,
@@ -737,7 +737,7 @@ accel_data_free (gpointer  user_data,
 }
 
 
-static void
+static gboolean
 window_accelerator_activated_cb (GtkAccelGroup	*accel_group,
 				 GObject		*object,
 				 guint		 key,
@@ -748,8 +748,12 @@ window_accelerator_activated_cb (GtkAccelGroup	*accel_group,
 	GAction   *action;
 
 	action = g_action_map_lookup_action (G_ACTION_MAP (accel_data->window), accel_data->action_name);
-	if (action != NULL)
+	if (action != NULL) {
 		g_action_activate (action, accel_data->target);
+		return GDK_EVENT_STOP;
+	}
+
+	return GDK_EVENT_PROPAGATE;
 }
 
 
@@ -877,4 +881,33 @@ _gtk_settings_get_dialogs_use_header (void)
 		      NULL);
 
 	return use_header;
+}
+
+
+void
+_gtk_application_add_accelerator_for_action (GtkApplication   *app,
+					     const char       *action_name,
+					     const char       *accel)
+{
+	const char *accels[2];
+
+	accels[0] = accel;
+	accels[1] = NULL;
+	gtk_application_set_accels_for_action (app, action_name, accels);
+}
+
+
+void
+_gtk_application_add_accelerators (GtkApplication *app,
+				   const FrAccelerator  *accelerators,
+				   int             n_accelerators)
+{
+	int i;
+
+	for (i = 0; i < n_accelerators; i++) {
+		const FrAccelerator *acc = accelerators + i;
+		_gtk_application_add_accelerator_for_action (GTK_APPLICATION (app),
+							     acc->action_name,
+							     acc->accelerator);
+	}
 }

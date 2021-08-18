@@ -1,12 +1,12 @@
 project('file-roller', 'c',
   license : 'GPL2+',
-  version : '3.30.1',
-  meson_version : '>=0.43'
+  version : '3.38.1',
+  meson_version : '>=0.50'
 )
 
-glib_version = '>=2.36'
-gtk_version = '>=3.13.2'
-nautilus_version = '>=2.22.2'
+glib_version = '>=2.38'
+gtk_version = '>=3.22.0'
+nautilus_version = '>=3.28.0'
 json_glib_version = '>=0.14.0'
 libnotify_version = '>=0.4.3'
 libarchive_version = '>=3.0.0'

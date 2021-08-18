@@ -688,7 +688,8 @@ fr_window_enable_action (FrWindow   *window,
 	GAction *action;
 
 	action = g_action_map_lookup_action (G_ACTION_MAP (window), action_name);
-	g_object_set (action, "enabled", enabled, NULL);
+	if (action != NULL)
+		g_object_set (action, "enabled", enabled, NULL);
 }
 
 
@@ -700,7 +701,8 @@ fr_window_set_action_state (FrWindow   *window,
 	GAction *action;
 
 	action = g_action_map_lookup_action (G_ACTION_MAP (window), action_name);
-	g_simple_action_set_state (G_SIMPLE_ACTION (action), g_variant_new_boolean (active));
+	if (action != NULL)
+		g_simple_action_set_state (G_SIMPLE_ACTION (action), g_variant_new_boolean (active));
 }
 
 
@@ -741,6 +743,9 @@ fr_window_update_paste_command_sensitivity (FrWindow     *window,
 
 	if (clipboard == NULL)
 		clipboard = gtk_widget_get_clipboard (GTK_WIDGET (window), _fr_window_get_clipboard_name (window));
+	if (clipboard == NULL)
+		return;
+
 	running    = window->priv->activity_ref > 0;
 	no_archive = (window->archive == NULL) || ! window->priv->archive_present;
 	ro         = ! no_archive && window->archive->read_only;
@@ -2153,9 +2158,7 @@ show_folder (GtkWindow *parent_window,
 	char   *uri;
 
 	uri = g_file_get_uri (folder);
-	if (! gtk_show_uri (parent_window != NULL ? gtk_window_get_screen (parent_window) : NULL,
-			    uri,
-			    GDK_CURRENT_TIME, &error))
+	if (! gtk_show_uri_on_window (parent_window, uri, GDK_CURRENT_TIME, &error))
 	{
 		GtkWidget *d;
 		char      *utf8_name;
@@ -2562,7 +2565,6 @@ create_the_progress_dialog (FrWindow *window)
 	gtk_window_set_title (GTK_WINDOW (dialog), title);
 	gtk_window_set_transient_for (GTK_WINDOW (dialog), parent);
 	gtk_window_set_modal (GTK_WINDOW (dialog), (flags & GTK_DIALOG_MODAL));
-	gtk_button_box_set_layout (GTK_BUTTON_BOX (gtk_dialog_get_action_area (GTK_DIALOG (dialog))), GTK_BUTTONBOX_EXPAND);
 	gtk_window_set_destroy_with_parent (GTK_WINDOW (dialog), (flags & GTK_DIALOG_DESTROY_WITH_PARENT));
 	g_object_weak_ref (G_OBJECT (dialog), (GWeakNotify) g_object_unref, builder);
 
@@ -3612,11 +3614,7 @@ dir_tree_button_press_cb (GtkWidget      *widget,
 				gtk_tree_selection_select_iter (selection, &iter);
 			}
 
-			gtk_menu_popup (GTK_MENU (window->priv->sidebar_folder_popup_menu),
-					NULL, NULL, NULL,
-					window,
-					event->button,
-					event->time);
+			gtk_menu_popup_at_pointer (GTK_MENU (window->priv->sidebar_folder_popup_menu), (GdkEvent *) event);
 		}
 		else
 			gtk_tree_selection_unselect_all (selection);
@@ -3804,17 +3802,9 @@ file_button_press_cb (GtkWidget      *widget,
 
 		n_selected = fr_window_get_n_selected_files (window);
 		if ((n_selected == 1) && selection_has_a_dir (window))
-			gtk_menu_popup (GTK_MENU (window->priv->folder_popup_menu),
-					NULL, NULL, NULL,
-					window,
-					event->button,
-					event->time);
+			gtk_menu_popup_at_pointer (GTK_MENU (window->priv->folder_popup_menu),  (GdkEvent *) event);
 		else
-			gtk_menu_popup (GTK_MENU (window->priv->file_popup_menu),
-					NULL, NULL, NULL,
-					window,
-					event->button,
-					event->time);
+			gtk_menu_popup_at_pointer (GTK_MENU (window->priv->file_popup_menu), (GdkEvent *) event);
 		return TRUE;
 	}
 	else if ((event->type == GDK_BUTTON_PRESS) && (event->button == 1)) {
@@ -4842,11 +4832,7 @@ key_press_cb (GtkWidget   *widget,
 			if (selection == NULL)
 				return FALSE;
 
-			gtk_menu_popup (GTK_MENU (window->priv->file_popup_menu),
-					NULL, NULL, NULL,
-					window,
-					3,
-					GDK_CURRENT_TIME);
+			gtk_menu_popup_at_pointer (GTK_MENU (window->priv->file_popup_menu), (GdkEvent *) event);
 			retval = TRUE;
 		}
 		break;
@@ -5544,7 +5530,6 @@ fr_window_construct (FrWindow *window)
 	gtk_widget_show (window->priv->layout);
 
 	gtk_window_set_title (GTK_WINDOW (window), _("Archive Manager"));
-	gtk_window_set_has_resize_grip (GTK_WINDOW (window), TRUE);
 
 	g_signal_connect (G_OBJECT (window),
 			  "delete_event",
@@ -5641,7 +5626,6 @@ fr_window_construct (FrWindow *window)
 	g_object_set_data (G_OBJECT (window->priv->list_store), "FrWindow", window);
 	window->priv->list_view = gtk_tree_view_new_with_model (GTK_TREE_MODEL (window->priv->list_store));
 
-	gtk_tree_view_set_rules_hint (GTK_TREE_VIEW (window->priv->list_view), TRUE);
 	add_file_list_columns (window, GTK_TREE_VIEW (window->priv->list_view));
 	gtk_tree_view_set_enable_search (GTK_TREE_VIEW (window->priv->list_view),
 					 TRUE);
@@ -6514,6 +6498,7 @@ typedef struct {
 #define _FR_RESPONSE_OVERWRITE_YES_ALL 100
 #define _FR_RESPONSE_OVERWRITE_YES     101
 #define _FR_RESPONSE_OVERWRITE_NO      102
+#define _FR_RESPONSE_OVERWRITE_NO_ALL  103
 
 
 static void
@@ -6693,6 +6678,11 @@ overwrite_dialog_response_cb (GtkDialog *dialog,
 		odata->current_file = odata->current_file->next;
 		break;
 
+	case _FR_RESPONSE_OVERWRITE_NO_ALL:
+		overwrite_data_skip_current (odata);
+		odata->edata->overwrite = FR_OVERWRITE_NO;
+		break;
+
 	case _FR_RESPONSE_OVERWRITE_NO:
 		overwrite_data_skip_current (odata);
 		break;
@@ -6710,6 +6700,7 @@ overwrite_dialog_response_cb (GtkDialog *dialog,
 
 	if (do_not_extract) {
 		fr_window_batch_stop (odata->window);
+		fr_window_dnd_extraction_finished (odata->window, FALSE);
 		overwrite_data_free (odata);
 		return;
 	}
@@ -6729,12 +6720,27 @@ query_info_ready_for_overwrite_dialog_cb (GObject      *source_object,
 	GFileType      file_type;
 
 	info = g_file_query_info_finish (destination, result, NULL);
+
+	/* file does not exist -> keep in the files to extract. */
+
 	if (info == NULL) {
 		odata->current_file = odata->current_file->next;
 		_fr_window_ask_overwrite_dialog (odata);
 		g_object_unref (destination);
 		return;
 	}
+
+	/* file exists and user selected "Overwrite Nothing" -> automatically
+	 * skip the file. */
+
+	if (odata->edata->overwrite == FR_OVERWRITE_NO) {
+		overwrite_data_skip_current (odata);
+		_fr_window_ask_overwrite_dialog (odata);
+		g_object_unref (destination);
+		return;
+	}
+
+	/* file exists and odata->edata->overwrite == FR_OVERWRITE_ASK */
 
 	file_type = g_file_info_get_file_type (info);
 	if ((file_type != G_FILE_TYPE_UNKNOWN) && (file_type != G_FILE_TYPE_DIRECTORY)) {
@@ -6754,6 +6760,7 @@ query_info_ready_for_overwrite_dialog_cb (GObject      *source_object,
 					     details,
 					     _GTK_LABEL_CANCEL, GTK_RESPONSE_CANCEL,
 					     _("Replace _All"), _FR_RESPONSE_OVERWRITE_YES_ALL,
+					     _("Replace _Nothing"), _FR_RESPONSE_OVERWRITE_NO_ALL,
 					     _("_Skip"), _FR_RESPONSE_OVERWRITE_NO,
 					     _("_Replace"), _FR_RESPONSE_OVERWRITE_YES,
 					     NULL);
@@ -6777,7 +6784,9 @@ query_info_ready_for_overwrite_dialog_cb (GObject      *source_object,
 	g_object_unref (info);
 	g_object_unref (destination);
 
-	odata->current_file = odata->current_file->next;
+	/* file exists and it's a directory or unknown -> skip */
+
+	overwrite_data_skip_current (odata);
 	_fr_window_ask_overwrite_dialog (odata);
 }
 
@@ -6786,8 +6795,10 @@ static void
 _fr_window_ask_overwrite_dialog (OverwriteData *odata)
 {
 	gboolean perform_extraction = TRUE;
+	gboolean check_file_existence;
 
-	if ((odata->edata->overwrite == FR_OVERWRITE_ASK) && (odata->current_file != NULL)) {
+	check_file_existence = (odata->edata->overwrite == FR_OVERWRITE_ASK) || (odata->edata->overwrite == FR_OVERWRITE_NO);
+	if (check_file_existence && (odata->current_file != NULL)) {
 		const char *base_name;
 		GFile      *destination;
 
@@ -6823,6 +6834,7 @@ _fr_window_ask_overwrite_dialog (OverwriteData *odata)
 			odata->edata->file_list = NULL;
 		}
 		odata->edata->overwrite = FR_OVERWRITE_YES;
+
 		_fr_window_archive_extract_from_edata (odata->window, odata->edata);
 	}
 	else {
@@ -9962,7 +9974,7 @@ fr_window_dnd_extraction_finished (FrWindow *window,
 {
 	if (window->priv->dnd_extract_is_running == TRUE) {
 		window->priv->dnd_extract_is_running = FALSE;
-		window->priv->dnd_extract_finished_with_error = TRUE;
+		window->priv->dnd_extract_finished_with_error = error;
 	}
 }
 

@@ -25,9 +25,7 @@
 #include <string.h>
 #include <glib/gi18n.h>
 #include <gio/gio.h>
-#include <libnautilus-extension/nautilus-extension-types.h>
-#include <libnautilus-extension/nautilus-file-info.h>
-#include <libnautilus-extension/nautilus-menu-provider.h>
+#include <nautilus-extension.h>
 #include <locale.h>
 #include "nautilus-fileroller.h"
 
@@ -105,6 +103,7 @@ extract_here_callback (NautilusMenuItem *item,
 	g_string_free (cmd, TRUE);
 }
 
+/** mime-types which aren't supported by nautilus itself */
 static struct {
 	char     *mime_type;
 	gboolean  is_compressed;
@@ -113,6 +112,8 @@ static struct {
 		{ "application/x-alz", TRUE },
 		{ "application/x-ar", TRUE },
 		{ "application/x-arj", TRUE },
+		{ "application/x-brotli", TRUE },
+		{ "application/x-brotli-compressed-tar", TRUE },
 		{ "application/vnd.ms-cab-compressed", TRUE },
 		{ "application/x-cbr", TRUE },
 		{ "application/x-cbz", TRUE },
@@ -126,15 +127,17 @@ static struct {
 		{ "application/x-java-archive", TRUE },
 		{ "application/x-lhz", TRUE },
 		{ "application/x-lzop", TRUE },
-		{ "application/x-lzop-compressed-tar", TRUE },
 		{ "application/x-ms-wim", TRUE },
 		{ "application/x-rar", TRUE },
 		{ "application/x-rar-compressed", TRUE },
 		{ "application/x-rpm", TRUE },
 		{ "application/x-rzip", TRUE },
 		{ "application/x-stuffit", TRUE },
+		{ "application/x-tzo", TRUE },
 		{ "application/x-war", TRUE },
 		{ "application/x-zoo", TRUE },
+		{ "application/x-zstd-compressed-tar", TRUE },
+		{ "application/zstd", TRUE },
 		{ "multipart/x-zip", TRUE },
 		{ NULL, FALSE }
 };

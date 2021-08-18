@@ -61,59 +61,64 @@
 /* The capabilities are computed automatically in
  * compute_supported_archive_types() so it's correct to initialize to 0 here. */
 FrMimeTypeDescription mime_type_desc[] = {
-	{ "application/epub+zip",               ".epub",     0 },
-	{ "application/x-7z-compressed",        ".7z",       0 },
-	{ "application/x-7z-compressed-tar",    ".tar.7z",   0 },
-	{ "application/x-ace",                  ".ace",      0 },
-	{ "application/x-alz",                  ".alz",      0 },
-	{ "application/x-ar",                   ".ar",       0 },
-	{ "application/x-arj",                  ".arj",      0 },
-	{ "application/x-bzip",                 ".bz2",      0 },
-	{ "application/x-bzip-compressed-tar",  ".tar.bz2",  0 },
-	{ "application/x-bzip1",                ".bz",       0 },
-	{ "application/x-bzip1-compressed-tar", ".tar.bz",   0 },
-	{ "application/vnd.ms-cab-compressed",  ".cab",      0 },
-	{ "application/x-cbr",                  ".cbr",      0 },
-	{ "application/x-cbz",                  ".cbz",      0 },
-	{ "application/x-cd-image",             ".iso",      0 },
-	{ "application/x-chrome-extension",	".crx",      0 },
-	{ "application/x-compress",             ".Z",        0 },
-	{ "application/x-compressed-tar",       ".tar.gz",   0 },
-	{ "application/x-cpio",                 ".cpio",     0 },
-	{ "application/x-deb",                  ".deb",      0 },
-	{ "application/x-debian-package",	".deb",      0 },
-	{ "application/vnd.debian.binary-package",	".deb",      0 },
-	{ "application/vnd.snap",		".snap",     0 },
-	{ "application/vnd.squashfs",		".sqsh",     0 },
-	{ "application/x-ear",                  ".ear",      0 },
-	{ "application/x-ms-dos-executable",    ".exe",      0 },
-	{ "application/x-gzip",                 ".gz",       0 },
-	{ "application/x-java-archive",         ".jar",      0 },
-	{ "application/x-lha",                  ".lzh",      0 },
-	{ "application/x-lrzip",                ".lrz",      0 },
-	{ "application/x-lrzip-compressed-tar", ".tar.lrz",  0 },
-	{ "application/x-lz4",                  ".lz4",      0 },
-	{ "application/x-lz4-compressed-tar",   ".tar.lz4",  0 },
-	{ "application/x-lzip",                 ".lz",       0 },
-	{ "application/x-lzip-compressed-tar",  ".tar.lz",   0 },
-	{ "application/x-lzma",                 ".lzma",     0 },
-	{ "application/x-lzma-compressed-tar",  ".tar.lzma", 0 },
-	{ "application/x-lzop",                 ".lzo",      0 },
-	{ "application/x-lzop-compressed-tar",  ".tar.lzo",  0 },
-	{ "application/x-ms-wim",               ".wim",      0 },
-	{ "application/x-rar",                  ".rar",      0 },
-	{ "application/x-rpm",                  ".rpm",      0 },
-	{ "application/x-rzip",                 ".rz",       0 },
-	{ "application/x-rzip-compressed-tar",  ".tar.rz",   0 },
-	{ "application/x-tar",                  ".tar",      0 },
-	{ "application/x-tarz",                 ".tar.Z",    0 },
-	{ "application/x-stuffit",              ".sit",      0 },
-	{ "application/x-war",                  ".war",      0 },
-	{ "application/x-xar",                  ".xar",      0 },
-	{ "application/x-xz",                   ".xz",       0 },
-	{ "application/x-xz-compressed-tar",    ".tar.xz",   0 },
-	{ "application/x-zoo",                  ".zoo",      0 },
-	{ "application/zip",                    ".zip",      0 },
+	{ "application/epub+zip",                  ".epub",     0 },
+	{ "application/x-7z-compressed",           ".7z",       0 },
+	{ "application/x-7z-compressed-tar",       ".tar.7z",   0 },
+	{ "application/x-ace",                     ".ace",      0 },
+	{ "application/x-alz",                     ".alz",      0 },
+	{ "application/vnd.android.package-archive", ".apk", 0 },
+	{ "application/x-ar",                      ".ar",       0 },
+	{ "application/x-arj",                     ".arj",      0 },
+	{ "application/x-brotli",                  ".br",       0 },
+	{ "application/x-brotli-compressed-tar",   ".tar.br",   0 },
+	{ "application/x-bzip",                    ".bz2",      0 },
+	{ "application/x-bzip-compressed-tar",     ".tar.bz2",  0 },
+	{ "application/x-bzip1",                   ".bz",       0 },
+	{ "application/x-bzip1-compressed-tar",    ".tar.bz",   0 },
+	{ "application/vnd.ms-cab-compressed",     ".cab",      0 },
+	{ "application/x-cbr",                     ".cbr",      0 },
+	{ "application/x-cbz",                     ".cbz",      0 },
+	{ "application/x-cd-image",                ".iso",      0 },
+	{ "application/x-chrome-extension",        ".crx",      0 },
+	{ "application/x-compress",                ".Z",        0 },
+	{ "application/x-compressed-tar",          ".tar.gz",   0 },
+	{ "application/x-cpio",                    ".cpio",     0 },
+	{ "application/x-deb",                     ".deb",      0 },
+	{ "application/x-debian-package",          ".deb",      0 },
+	{ "application/vnd.debian.binary-package", ".deb",      0 },
+	{ "application/vnd.snap",                  ".snap",     0 },
+	{ "application/vnd.squashfs",              ".sqsh",     0 },
+	{ "application/x-ear",                     ".ear",      0 },
+	{ "application/x-ms-dos-executable",       ".exe",      0 },
+	{ "application/x-gzip",                    ".gz",       0 },
+	{ "application/x-java-archive",            ".jar",      0 },
+	{ "application/x-lha",                     ".lzh",      0 },
+	{ "application/x-lrzip",                   ".lrz",      0 },
+	{ "application/x-lrzip-compressed-tar",    ".tar.lrz",  0 },
+	{ "application/x-lz4",                     ".lz4",      0 },
+	{ "application/x-lz4-compressed-tar",      ".tar.lz4",  0 },
+	{ "application/x-lzip",                    ".lz",       0 },
+	{ "application/x-lzip-compressed-tar",     ".tar.lz",   0 },
+	{ "application/x-lzma",                    ".lzma",     0 },
+	{ "application/x-lzma-compressed-tar",     ".tar.lzma", 0 },
+	{ "application/x-lzop",                    ".lzo",      0 },
+	{ "application/x-ms-wim",                  ".wim",      0 },
+	{ "application/x-rar",                     ".rar",      0 },
+	{ "application/x-rpm",                     ".rpm",      0 },
+	{ "application/x-rzip",                    ".rz",       0 },
+	{ "application/x-rzip-compressed-tar",     ".tar.rz",   0 },
+	{ "application/x-tar",                     ".tar",      0 },
+	{ "application/x-tarz",                    ".tar.Z",    0 },
+	{ "application/x-tzo",                     ".tar.lzo",  0 },
+	{ "application/x-stuffit",                 ".sit",      0 },
+	{ "application/x-war",                     ".war",      0 },
+	{ "application/x-xar",                     ".xar",      0 },
+	{ "application/x-xz",                      ".xz",       0 },
+	{ "application/x-xz-compressed-tar",       ".tar.xz",   0 },
+	{ "application/x-zoo",                     ".zoo",      0 },
+	{ "application/x-zstd-compressed-tar",     ".tar.zst",  0 },
+	{ "application/zip",                       ".zip",      0 },
+	{ "application/zstd",                      ".zst",      0 },
 	{ NULL, NULL, 0 }
 };
 
@@ -121,9 +126,11 @@ FrExtensionType file_ext_type[] = {
 	{ ".7z", "application/x-7z-compressed" },
 	{ ".ace", "application/x-ace" },
 	{ ".alz", "application/x-alz" },
+	{ ".apk", "application/vnd.android.package-archive" },
 	{ ".ar", "application/x-ar" },
 	{ ".arj", "application/x-arj" },
 	{ ".bin", "application/x-stuffit" },
+	{ ".br", "application/x-brotli" },
 	{ ".bz", "application/x-bzip" },
 	{ ".bz2", "application/x-bzip" },
 	{ ".cab", "application/vnd.ms-cab-compressed" },
@@ -154,6 +161,7 @@ FrExtensionType file_ext_type[] = {
 	{ ".sqsh", "application/vnd.squashfs" },
 	{ ".swm", "application/x-ms-wim" },
 	{ ".tar", "application/x-tar" },
+	{ ".tar.br", "application/x-brotli-compressed-tar" },
 	{ ".tar.bz", "application/x-bzip-compressed-tar" },
 	{ ".tar.bz2", "application/x-bzip-compressed-tar" },
 	{ ".tar.gz", "application/x-compressed-tar" },
@@ -161,11 +169,12 @@ FrExtensionType file_ext_type[] = {
 	{ ".tar.lz", "application/x-lzip-compressed-tar" },
 	{ ".tar.lz4", "application/x-lz4-compressed-tar" },
 	{ ".tar.lzma", "application/x-lzma-compressed-tar" },
-	{ ".tar.lzo", "application/x-lzop-compressed-tar" },
+	{ ".tar.lzo", "application/x-tzo" },
 	{ ".tar.7z", "application/x-7z-compressed-tar" },
 	{ ".tar.rz", "application/x-rzip-compressed-tar" },
 	{ ".tar.xz", "application/x-xz-compressed-tar" },
 	{ ".tar.Z", "application/x-tarz" },
+	{ ".tar.zst", "application/x-zstd-compressed-tar" },
 	{ ".taz", "application/x-tarz" },
 	{ ".tbz", "application/x-bzip-compressed-tar" },
 	{ ".tbz2", "application/x-bzip-compressed-tar" },
@@ -174,7 +183,8 @@ FrExtensionType file_ext_type[] = {
 	{ ".tlz", "application/x-lzip-compressed-tar" },
 	{ ".tlz4", "application/x-lz4-compressed-tar" },
 	{ ".tzma", "application/x-lzma-compressed-tar" },
-	{ ".tzo", "application/x-lzop-compressed-tar" },
+	{ ".tzo", "application/x-tzo" },
+	{ ".tzst", "application/x-zstd-compressed-tar" },
 	{ ".war", "application/x-war" },
 	{ ".wim", "application/x-ms-wim" },
 	{ ".xar", "application/x-xar" },
@@ -183,6 +193,7 @@ FrExtensionType file_ext_type[] = {
 	{ ".Z", "application/x-compress" },
 	{ ".zip", "application/zip" },
 	{ ".zoo", "application/x-zoo" },
+	{ ".zst", "application/zstd" },
 	{ NULL, NULL }
 };
 
@@ -363,31 +374,31 @@ register_archives (void)
 	 * format, regardless of the registration order. */
 
 #if ENABLE_LIBARCHIVE
-	register_archive (FR_TYPE_ARCHIVE_LIBARCHIVE);
+	register_archive (fr_archive_libarchive_get_type ());
 #endif
 
-	register_archive (FR_TYPE_COMMAND_TAR);
-	register_archive (FR_TYPE_COMMAND_CFILE);
-	register_archive (FR_TYPE_COMMAND_7Z);
-	register_archive (FR_TYPE_COMMAND_DPKG);
+	register_archive (fr_command_tar_get_type ());
+	register_archive (fr_command_cfile_get_type ());
+	register_archive (fr_command_7z_get_type ());
+	register_archive (fr_command_dpkg_get_type ());
 
-	register_archive (FR_TYPE_COMMAND_ACE);
-	register_archive (FR_TYPE_COMMAND_ALZ);
-	register_archive (FR_TYPE_COMMAND_AR);
-	register_archive (FR_TYPE_COMMAND_ARJ);
-	register_archive (FR_TYPE_COMMAND_CPIO);
-	register_archive (FR_TYPE_COMMAND_ISO);
-	register_archive (FR_TYPE_COMMAND_JAR);
-	register_archive (FR_TYPE_COMMAND_LHA);
-	register_archive (FR_TYPE_COMMAND_RAR);
-	register_archive (FR_TYPE_COMMAND_RPM);
-	register_archive (FR_TYPE_COMMAND_UNSQUASHFS);
-	register_archive (FR_TYPE_COMMAND_UNSTUFF);
-	register_archive (FR_TYPE_COMMAND_ZIP);
-	register_archive (FR_TYPE_COMMAND_LRZIP);
-	register_archive (FR_TYPE_COMMAND_ZOO);
+	register_archive (fr_command_ace_get_type ());
+	register_archive (fr_command_alz_get_type ());
+	register_archive (fr_command_ar_get_type ());
+	register_archive (fr_command_arj_get_type ());
+	register_archive (fr_command_cpio_get_type ());
+	register_archive (fr_command_iso_get_type ());
+	register_archive (fr_command_jar_get_type ());
+	register_archive (fr_command_lha_get_type ());
+	register_archive (fr_command_rar_get_type ());
+	register_archive (fr_command_rpm_get_type ());
+	register_archive (fr_command_unsquashfs_get_type ());
+	register_archive (fr_command_unstuff_get_type ());
+	register_archive (fr_command_zip_get_type ());
+	register_archive (fr_command_lrzip_get_type ());
+	register_archive (fr_command_zoo_get_type ());
 #if HAVE_JSON_GLIB
-	register_archive (FR_TYPE_COMMAND_UNARCHIVER);
+	register_archive (fr_command_unarchiver_get_type ());
 #endif
 }
 

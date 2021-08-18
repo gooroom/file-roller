@@ -34,7 +34,15 @@
 #include "fr-command-cfile.h"
 
 
-G_DEFINE_TYPE (FrCommandCFile, fr_command_cfile, FR_TYPE_COMMAND)
+struct _FrCommandCFile
+{
+	FrCommand  parent_instance;
+
+	FrError    error;
+};
+
+
+G_DEFINE_TYPE (FrCommandCFile, fr_command_cfile, fr_command_get_type ())
 
 
 static char *
@@ -231,6 +239,14 @@ fr_command_cfile_add (FrCommand  *comm,
 		fr_process_end_command (comm->process);
 		compressed_filename = g_strconcat (filename, ".gz", NULL);
 	}
+	else if (_g_mime_type_matches (archive->mime_type, "application/x-brotli")) {
+		fr_process_begin_command (comm->process, "brotli");
+		fr_process_set_working_dir (comm->process, temp_dir);
+		fr_process_add_arg (comm->process, "--");
+		fr_process_add_arg (comm->process, filename);
+		fr_process_end_command (comm->process);
+		compressed_filename = g_strconcat (filename, ".br", NULL);
+	}
 	else if (_g_mime_type_matches (archive->mime_type, "application/x-bzip")) {
 		fr_process_begin_command (comm->process, "bzip2");
 		fr_process_set_working_dir (comm->process, temp_dir);
@@ -297,6 +313,14 @@ fr_command_cfile_add (FrCommand  *comm,
 		fr_process_add_arg (comm->process, filename);
 		fr_process_add_arg (comm->process, compressed_filename);
 		fr_process_end_command (comm->process);
+	}
+	else if (_g_mime_type_matches (archive->mime_type, "application/zstd")) {
+		fr_process_begin_command (comm->process, "zstd");
+		fr_process_set_working_dir (comm->process, temp_dir);
+		fr_process_add_arg (comm->process, "--");
+		fr_process_add_arg (comm->process, filename);
+		fr_process_end_command (comm->process);
+		compressed_filename = g_strconcat (filename, ".zst", NULL);
 	}
 	else {
 		g_warning ("Unhandled mime type: '%s'", archive->mime_type);
@@ -383,6 +407,14 @@ fr_command_cfile_extract (FrCommand  *comm,
 		fr_process_add_arg (comm->process, temp_file);
 		fr_process_end_command (comm->process);
 	}
+	else if (_g_mime_type_matches (archive->mime_type, "application/x-brotli")) {
+		fr_process_begin_command (comm->process, "brotli");
+		fr_process_set_working_dir (comm->process, temp_dir);
+		fr_process_add_arg (comm->process, "-f");
+		fr_process_add_arg (comm->process, "-d");
+		fr_process_add_arg (comm->process, temp_file);
+		fr_process_end_command (comm->process);
+	}
 	else if (_g_mime_type_matches (archive->mime_type, "application/x-bzip")) {
 		fr_process_begin_command (comm->process, "bzip2");
 		fr_process_set_working_dir (comm->process, temp_dir);
@@ -454,6 +486,14 @@ fr_command_cfile_extract (FrCommand  *comm,
 		fr_process_add_arg (comm->process, uncompr_file);
 		fr_process_end_command (comm->process);
 	}
+	else if (_g_mime_type_matches (archive->mime_type, "application/zstd")) {
+		fr_process_begin_command (comm->process, "zstd");
+		fr_process_set_working_dir (comm->process, temp_dir);
+		fr_process_add_arg (comm->process, "-f");
+		fr_process_add_arg (comm->process, "-d");
+		fr_process_add_arg (comm->process, temp_file);
+		fr_process_end_command (comm->process);
+	}
 
 	/* copy uncompress file to the dest dir */
 
@@ -488,6 +528,7 @@ fr_command_cfile_extract (FrCommand  *comm,
 
 
 const char *cfile_mime_type[] = { "application/x-gzip",
+				  "application/x-brotli",
 				  "application/x-bzip",
 				  "application/x-compress",
 				  "application/x-lz4",
@@ -496,6 +537,7 @@ const char *cfile_mime_type[] = { "application/x-gzip",
 				  "application/x-lzop",
 				  "application/x-rzip",
 				  "application/x-xz",
+				  "application/zstd",
 				  NULL };
 
 
@@ -516,6 +558,10 @@ fr_command_cfile_get_capabilities (FrArchive  *archive,
 	capabilities = FR_ARCHIVE_CAN_DO_NOTHING;
 	if (_g_mime_type_matches (mime_type, "application/x-gzip")) {
 		if (_g_program_is_available ("gzip", check_command))
+			capabilities |= FR_ARCHIVE_CAN_READ_WRITE;
+	}
+	else if (_g_mime_type_matches (mime_type, "application/x-brotli")) {
+		if (_g_program_is_available ("brotli", check_command))
 			capabilities |= FR_ARCHIVE_CAN_READ_WRITE;
 	}
 	else if (_g_mime_type_matches (mime_type, "application/x-bzip")) {
@@ -553,6 +599,10 @@ fr_command_cfile_get_capabilities (FrArchive  *archive,
 		if (_g_program_is_available ("lz4", check_command))
 			capabilities |= FR_ARCHIVE_CAN_READ_WRITE;
 	}
+	else if (_g_mime_type_matches (mime_type, "application/zstd")) {
+		if (_g_program_is_available ("zstd", check_command))
+			capabilities |= FR_ARCHIVE_CAN_READ_WRITE;
+	}
 	return capabilities;
 }
 
@@ -563,6 +613,8 @@ fr_command_cfile_get_packages (FrArchive  *archive,
 {
 	if (_g_mime_type_matches (mime_type, "application/x-gzip"))
 		return PACKAGES ("gzip");
+	else if (_g_mime_type_matches (mime_type, "application/x-brotli"))
+		return PACKAGES ("brotli");
 	else if (_g_mime_type_matches (mime_type, "application/x-bzip"))
 		return PACKAGES ("bzip2");
 	else if (_g_mime_type_matches (mime_type, "application/x-compress"))
@@ -579,6 +631,8 @@ fr_command_cfile_get_packages (FrArchive  *archive,
 		return PACKAGES ("rzip");
 	else if (_g_mime_type_matches (mime_type, "application/x-lz4"))
 		return PACKAGES ("lz4");
+	else if (_g_mime_type_matches (mime_type, "application/zstd"))
+		return PACKAGES ("zstd");
 
 	return NULL;
 }

@@ -34,7 +34,15 @@
 #include "rar-utils.h"
 
 
-G_DEFINE_TYPE (FrCommand7z, fr_command_7z, FR_TYPE_COMMAND)
+struct _FrCommand7z
+{
+	FrCommand  parent_instance;
+	gboolean   list_started;
+	FileData  *fdata;
+};
+
+
+G_DEFINE_TYPE (FrCommand7z, fr_command_7z, fr_command_get_type ())
 
 
 /* -- list -- */
@@ -88,24 +96,7 @@ list__process_line (char     *line,
 	g_return_if_fail (line != NULL);
 
 	if (! self->list_started) {
-		if (strncmp (line, "p7zip Version ", 14) == 0) {
-			const char *ver_start;
-			int         ver_len;
-			char        version[256];
-
-			ver_start = _g_str_eat_spaces (line + 14);
-			ver_len = strchr (ver_start, ' ') - ver_start;
-			strncpy (version, ver_start, ver_len);
-			version[ver_len] = 0;
-
-			if ((strcmp (version, "4.55") < 0) && (ver_len > 1) && (version[1] == '.'))
-				self->old_style = TRUE;
-			else
-				self->old_style = FALSE;
-		}
-		else if (self->old_style && (strncmp (line, "Listing archive: ", 17) == 0))
-			self->list_started = TRUE;
-		else if (! self->old_style && (strcmp (line, "----------") == 0))
+		if (strcmp (line, "----------") == 0)
 			self->list_started = TRUE;
 		else if (strncmp (line, "Multivolume = ", 14) == 0) {
 			fields = g_strsplit (line, " = ", 2);
@@ -294,7 +285,7 @@ process_line__add (char     *line,
 	}
 
 	if (fr_archive_progress_get_total_files (archive) > 0)
-		parse_progress_line (archive, "Compressing  ", _("Adding “%s”"), line);
+		parse_progress_line (archive, "+ ", _("Adding “%s”"), line);
 }
 
 
@@ -332,6 +323,7 @@ fr_command_7z_add (FrCommand  *command,
 	}
 
 	fr_process_add_arg (command->process, "-bd");
+	fr_process_add_arg (command->process, "-bb1");
 	fr_process_add_arg (command->process, "-y");
 	if (follow_links)
 		fr_process_add_arg (command->process, "-l");
@@ -446,7 +438,7 @@ process_line__extract (char     *line,
 	FrArchive *archive = FR_ARCHIVE (data);
 
 	if (fr_archive_progress_get_total_files (archive) > 0)
-		parse_progress_line (archive, "Extracting  ", _("Extracting “%s”"), line);
+		parse_progress_line (archive, "- ", _("Extracting “%s”"), line);
 }
 
 
@@ -474,6 +466,7 @@ fr_command_7z_extract (FrCommand  *command,
 		fr_process_add_arg (command->process, "x");
 
 	fr_process_add_arg (command->process, "-bd");
+	fr_process_add_arg (command->process, "-bb1");
 	fr_process_add_arg (command->process, "-y");
 	add_password_arg (command, archive->password, FALSE);
 
