@@ -23,6 +23,7 @@ Homepage: https://wiki.gnome.org/Apps/FileRoller
 Package: file-roller
 Architecture: any
 Depends: bzip2,
+         binutils,
          ${zip:Depends},
          ${misc:Depends},
          ${shlibs:Depends}

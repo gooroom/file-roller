@@ -3,3 +3,4 @@ gooroom-changed-minimum-volume-size.patch
 gooroom-add-nemo-properties.patch
 gooroom-removed-unsupported-formats.patch
 gooroom-fix-empty-directory-encryption-error.patch
+gooroom-fix-ar-jar-format-compression-error.patch

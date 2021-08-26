@@ -14,7 +14,7 @@ override_dh_makeshlibs:
 
 # p7zip is in Ubuntu "universe"
 override_dh_gencontrol:
-ifeq ($(shell dpkg-vendor --query vendor),Ubuntu)
+ifeq ($(shell dpkg-vendor --query vendor),Debian)
 	dh_gencontrol -- \
 		-Vzip:Depends='unzip, zip' \
 		-Vzip:Suggests='p7zip-full'
