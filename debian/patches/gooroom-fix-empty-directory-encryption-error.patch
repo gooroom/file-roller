@@ -1,0 +1,101 @@
+From 2a4f32e59ed6c7bbf73017f19731c33cc5f7c1b4 Mon Sep 17 00:00:00 2001
+From: "byunghui.jeun@gooroom.kr" <byunghui.jeun@gooroom.kr>
+Date: Fri, 26 Mar 2021 13:11:28 +0900
+Subject: [PATCH] fix empty directory encryption error.
+
+---
+ src/fr-new-archive-dialog.c | 50 ++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 46 insertions(+), 4 deletion(-)
+
+diff --git a/src/fr-new-archive-dialog.c b/src/fr-new-archive-dialog.c
+index 1191816..2b76bad 100644
+--- a/src/fr-new-archive-dialog.c
++++ b/src/fr-new-archive-dialog.c
+@@ -46,6 +46,7 @@ struct _FrNewArchiveDialog {
+ 	gboolean    can_encrypt;
+ 	gboolean    can_encrypt_header;
+ 	gboolean    can_create_volumes;
++        gboolean    empty;
+ 	GFile      *original_file;
+ 	GList      *files_to_add;
+ };
+@@ -77,6 +78,31 @@ get_selected_format (FrNewArchiveDialog *self)
+ 	return self->supported_types[gtk_combo_box_get_active (GTK_COMBO_BOX (GET_WIDGET ("extension_comboboxtext")))];
+ }
+ 
++static gboolean
++check_if_selection_is_empty (char *selection) {
++    gboolean ret = TRUE;
++    GDir *dir = NULL;
++    gchar *scan = NULL;
++    gchar *scan_path = NULL;
++
++    if (!g_file_test (selection, G_FILE_TEST_IS_DIR))
++        ret = FALSE;
++    else if (dir = g_dir_open (selection, 0, NULL))
++    {
++        while (scan = g_dir_read_name (dir))
++        {
++            scan_path = g_strconcat (selection, "/", scan, NULL);
++            if (!check_if_selection_is_empty (scan_path))
++                ret = FALSE;
++            g_free (scan_path);
++            if (FALSE == ret)
++                break;
++        }
++        g_dir_close (dir);
++    }
++    return ret;
++}
++
+ 
+ static void
+ fr_new_archive_dialog_unmap (GtkWidget *widget)
+@@ -156,7 +182,11 @@ extension_comboboxtext_changed_cb (GtkComboBox *combo_box,
+ 
+ 	n_format = get_selected_format (self);
+ 
+-	self->can_encrypt = mime_type_desc[n_format].capabilities & FR_ARCHIVE_CAN_ENCRYPT;
++        if (self->empty)
++                self->can_encrypt = FALSE;
++        else
++	        self->can_encrypt = mime_type_desc[n_format].capabilities & FR_ARCHIVE_CAN_ENCRYPT;
++
+ 	gtk_widget_set_sensitive (GET_WIDGET ("password_entry"), self->can_encrypt);
+ 	gtk_widget_set_sensitive (GET_WIDGET ("password_label"), self->can_encrypt);
+ 
+@@ -197,9 +227,10 @@ _fr_new_archive_dialog_construct (FrNewArchiveDialog *self,
+ 				  const char         *default_name,
+ 				  GFile              *original_file)
+ {
+-	char *active_extension;
+-	int   active_extension_idx;
+-	int   i;
++	char  *active_extension;
++	int    active_extension_idx;
++	int    i;
++        gchar *selection = NULL;
+ 
+ 	gtk_window_set_transient_for (GTK_WINDOW (self), parent);
+ 	gtk_window_set_resizable (GTK_WINDOW (self), FALSE);
+@@ -276,6 +307,17 @@ _fr_new_archive_dialog_construct (FrNewArchiveDialog *self,
+ 
+ 	_gtk_entry_use_as_password_entry (GTK_ENTRY (GET_WIDGET ("password_entry")));
+ 
++        selection = g_strconcat (g_file_get_path (folder), "/", default_name, NULL);
++        if (check_if_selection_is_empty (selection))
++        {
++            self->empty = TRUE;
++               gtk_widget_set_sensitive (GET_WIDGET ("password_entry"), FALSE);
++               gtk_widget_set_sensitive (GET_WIDGET ("password_label"), FALSE);
++        }
++        else
++            self->empty = FALSE;
++        g_free (selection);
++
+ 	/* Set the signals handlers. */
+ 
+ 	g_signal_connect (GET_WIDGET ("filename_entry"),
+-- 
+2.20.1
+
