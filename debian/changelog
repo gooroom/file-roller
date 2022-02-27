@@ -1,4 +1,4 @@
-file-roller (3.38.1-1+grm3u1) unstable; urgency=medium
+file-roller (3.38.1-1+grm3u2) unstable; urgency=medium
 
   [ heejun.jang ]
   * [3ccb3952] [Bug:2904]Changed the minimum volume size
@@ -8,7 +8,10 @@ file-roller (3.38.1-1+grm3u1) unstable; urgency=medium
   * [dbf04028] [Bug:3363]Fix ar,jar Format Compression Error
   * [401ba5ac] Rollback the nemo policy properties
 
- -- Gooroom Autobuilder <jenkins@gooroom.kr>  Sat, 04 Dec 2021 16:54:40 +0900
+  [ donghun ]
+  * [c9ffbbea] [Bugs 4681,4685,4687]Added message title in dialog
+
+ -- Gooroom Autobuilder <jenkins@gooroom.kr>  Sun, 27 Feb 2022 15:22:49 +0900
 
 file-roller (3.38.1-1) unstable; urgency=medium
 
