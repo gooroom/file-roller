@@ -1,3 +1,18 @@
+file-roller (3.38.1-1+grm3u2) unstable; urgency=medium
+
+  [ heejun.jang ]
+  * [3ccb3952] [Bug:2904]Changed the minimum volume size
+  * [151d93f7] Added the nemo policy properties
+  * [6381ec96] Removed unsupported formats
+  * [2253d369] [Bug:3367]Fix Empty Directory Encryption Error
+  * [dbf04028] [Bug:3363]Fix ar,jar Format Compression Error
+  * [401ba5ac] Rollback the nemo policy properties
+
+  [ donghun ]
+  * [c9ffbbea] [Bugs 4681,4685,4687]Added message title in dialog
+
+ -- Gooroom Autobuilder <jenkins@gooroom.kr>  Sun, 27 Feb 2022 15:22:49 +0900
+
 file-roller (3.38.1-1) unstable; urgency=medium
 
   * New upstream release including a fix for CVE-2020-36314
