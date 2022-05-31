@@ -1,0 +1,27 @@
+diff --git a/po/ko.po b/po/ko.po
+index 175274b..ba9dc91 100644
+--- a/po/ko.po
++++ b/po/ko.po
+@@ -323,7 +323,7 @@ msgstr "폴더 만들기(_F)"
+ #: src/fr-window.c:4410 src/fr-window.c:6844 src/fr-window.c:6849
+ #: src/fr-window.c:6949 src/fr-window.c:6968 src/fr-window.c:6973
+ msgid "Extraction not performed"
+-msgstr "풀 수 없습니다"
++msgstr "압축풀기가 실행되지 않습니다"
+ 
+ #: src/dlg-extract.c:123 src/fr-window.c:6945
+ #, c-format
+diff --git a/src/fr-window.c b/src/fr-window.c
+index 59a063e..aa43587 100644
+--- a/src/fr-window.c
++++ b/src/fr-window.c
+@@ -2940,7 +2940,8 @@ fr_window_show_error_dialog (FrWindow   *window,
+ 	if (dialog_parent != NULL)
+ 		gtk_window_set_modal (GTK_WINDOW (dialog), TRUE);
+ 
+-	gtk_window_set_title (GTK_WINDOW (dialog), _("Error"));
++        if (g_strcmp0 (gtk_window_get_title (GTK_WINDOW (dialog)), "") == 0)
++		gtk_window_set_title (GTK_WINDOW (dialog), _("Error"));
+ 	gtk_widget_show (dialog);
+ 
+ 	window->priv->showing_error_dialog = TRUE;

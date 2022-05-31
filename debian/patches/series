@@ -4,3 +4,4 @@ gooroom-removed-unsupported-formats.patch
 gooroom-fix-empty-directory-encryption-error.patch
 gooroom-fix-ar-jar-format-compression-error.patch
 gooroom-add-error-message-title-in-dialog.patch
+gooroom-fix-Extraction-not-performed-dialog.patch
