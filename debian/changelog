@@ -1,3 +1,13 @@
+file-roller (3.38.1-1+grm3u3) unstable; urgency=medium
+
+  [ Jenkins User ]
+  * [7ee445c0] Version 3.38.1-1+grm3u1 released
+
+  [ heejun.jang ]
+  * [25542de9] [Bug:5305]Fix Extraction not Performed Dialog
+
+ -- Gooroom Autobuilder <jenkins@gooroom.kr>  Mon, 20 Jun 2022 08:27:28 +0900
+
 file-roller (3.38.1-1+grm3u2) unstable; urgency=medium
 
   [ heejun.jang ]
